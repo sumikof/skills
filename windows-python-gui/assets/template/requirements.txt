@@ -1,0 +1,5 @@
+# 実行依存
+# tkinterはPython標準ライブラリなので不要
+
+# ビルド依存（開発時のみ）
+pyinstaller>=6.0
