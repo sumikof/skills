@@ -1,358 +1,139 @@
-# LangGraph Troubleshooting & Debugging (v1.0.8)
+# トラブルシューティング (LangGraph 1.0)
 
-## Table of Contents
-1. [Common Errors](#common-errors)
-2. [Debugging Techniques](#debugging-techniques)
-3. [Performance Tuning](#performance-tuning)
-4. [State Design Pitfalls](#state-design-pitfalls)
-5. [Checkpointer Issues](#checkpointer-issues)
-6. [Streaming Pitfalls](#streaming-pitfalls)
+## よくあるエラーと解決策
 
----
-
-## Common Errors
-
-### `ValueError: Checkpointer required`
+### ImportError: cannot import name 'create_react_agent'
 
 ```
-ValueError: This graph requires a checkpointer to use interrupt()
+ImportError: cannot import name 'create_react_agent' from 'langgraph.prebuilt'
 ```
 
-**Cause**: `interrupt()` used without a checkpointer in `compile()`.
-**Fix**:
+**原因**: LangGraphのバージョンが古い
+
+```bash
+pip install --upgrade langgraph langchain-openai
+# LangGraph 1.0以上を確認
+python -c "import langgraph; print(langgraph.__version__)"
+```
+
+**LangGraph 1.0の正しいインポート**:
 ```python
-from langgraph.checkpoint.memory import InMemorySaver
-graph = builder.compile(checkpointer=InMemorySaver())
+from langgraph.prebuilt import create_react_agent  # ✅ 1.0
+from langgraph.prebuilt import ToolNode, tools_condition  # ✅ 1.0
+from langgraph.checkpoint.memory import MemorySaver  # ✅ 1.0
+from langgraph.graph import StateGraph, START, END  # ✅ 1.0
 ```
 
-### `GraphRecursionError: Recursion limit reached`
+### AuthenticationError / API Key
 
 ```
-GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition
+openai.AuthenticationError: Incorrect API key provided
 ```
 
-**Cause**: Agent loop iterating too many times (infinite tool-call loop, or complex workflow).
-**Fix**:
 ```python
-# Increase limit
-result = graph.invoke(input, config={"recursion_limit": 50})
+import os
+os.environ["OPENAI_API_KEY"] = "sk-..."  # 直接設定
 
-# Or fix the root cause: ensure the routing function eventually returns END
+# または .env から読み込み
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+### RecursionError / GraphRecursionError
+
+```
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached
+```
+
+**原因**: グラフが無限ループしている
+
+```python
+# 再帰制限を増やす（根本解決ではない）
+app.invoke(state, {"recursion_limit": 50})
+
+# 根本対策: ループの終了条件を確認
 def should_continue(state):
-    if len(state["messages"]) > 20:  # safety cap
+    if len(state["messages"]) > 10:  # 上限を設ける
         return END
-    return "tools" if state["messages"][-1].tool_calls else END
+    return "model"
 ```
 
-### `InvalidUpdateError: Expected dict, got ...`
+### TypeError: State キーが見つからない
 
-**Cause**: Node returned something other than a `dict`.
-**Fix**: Ensure every node returns `dict` with state keys:
-```python
-# Wrong
-def my_node(state):
-    return "done"
-
-# Correct
-def my_node(state):
-    return {"result": "done"}
+```
+KeyError: 'messages'
 ```
 
-### `KeyError` in State access
+**原因**: 初期ステートに必要なキーがない
 
-**Cause**: Accessing a state key that wasn't initialized.
-**Fix**: Provide defaults in initial state, or use `.get()`:
 ```python
-# Option 1: Initialize all keys
-graph.invoke({"messages": [], "count": 0, "result": ""})
-
-# Option 2: Use Optional in TypedDict
-class State(TypedDict, total=False):
-    messages: Annotated[list, add_messages]
-    result: str  # optional, may not exist
+# 必要なキーをすべて含めて初期化
+result = app.invoke({
+    "messages": [],  # 空リストでも必要
+    "user_name": "",
+    "step_count": 0,
+})
 ```
 
-### `ToolException: Tool ... not found`
+### ツールが呼ばれない
 
-**Cause**: LLM generated a tool call for a tool not registered in the graph.
-**Fix**:
+**確認事項**:
 ```python
-# Verify tool names match
-print([t.name for t in tools])  # check registered names
+# 1. モデルにツールをバインドしているか
+model_with_tools = model.bind_tools(tools)  # ← 忘れがち
 
-# Add error handling in tool node
-def tool_node(state):
-    for tool_call in state["messages"][-1].tool_calls:
-        if tool_call["name"] not in tools_by_name:
-            return {"messages": [ToolMessage(
-                content=f"Error: Unknown tool '{tool_call['name']}'",
-                tool_call_id=tool_call["id"],
-            )]}
-        ...
-```
-
-### `interrupt()` inside try/except silently fails
-
-**Cause**: `interrupt()` raises a special exception internally. Catching it prevents the pause.
-**Fix**: Never wrap `interrupt()` in try/except:
-```python
-# Wrong
-def review(state):
-    try:
-        decision = interrupt({"draft": state["draft"]})
-    except Exception:
-        decision = {"approved": False}
-
-# Correct
-def review(state):
-    decision = interrupt({"draft": state["draft"]})
+# 2. ツールのdocstringが明確か（モデルがツールを選択する判断材料）
+@tool
+def search(query: str) -> str:
+    """ウェブで情報を検索する。質問への回答に必要な情報を取得するために使用。"""  # ← 具体的に
     ...
+
+# 3. temperature=0 で確定的な動作に
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 ```
 
----
-
-## Debugging Techniques
-
-### Enable debug mode
+### チェックポインターのスレッドID忘れ
 
 ```python
-# At compile time
-graph = builder.compile(debug=True)
+# ❌ 毎回新しいスレッドになる（会話が引き継がれない）
+app.invoke(state, {"configurable": {}})
 
-# Or per-invocation via config
-graph.invoke(input, config={"debug": True})
-```
-Debug mode logs each node execution, state transitions, and routing decisions.
-
-### Graph visualization
-
-```python
-# Mermaid diagram (paste into mermaid.live)
-print(graph.get_graph().draw_mermaid())
-
-# ASCII art (terminal-friendly)
-print(graph.get_graph().draw_ascii())
-
-# PNG image (requires graphviz + pygraphviz or grandalf)
-graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
+# ✅ 同じthread_idで会話を維持
+config = {"configurable": {"thread_id": "user-session-123"}}
+app.invoke(state, config)
 ```
 
-### Inspect state at any point
+## バージョン別の変更点
+
+### LangGraph 0.x → 1.0 の主な変更
+
+| 0.x | 1.0 |
+|---|---|
+| `from langgraph.checkpoint import MemorySaver` | `from langgraph.checkpoint.memory import MemorySaver` |
+| `graph.add_node("node", func)` | 同じ（変更なし） |
+| `StateGraph(State).compile()` | 同じ（変更なし） |
+| `graph.__call__(state)` | `graph.invoke(state)` を推奨 |
+
+## デバッグ方法
 
 ```python
-config = {"configurable": {"thread_id": "debug-session"}}
-graph = builder.compile(checkpointer=InMemorySaver())
+# ストリームで各ステップを確認
+for event in app.stream(initial_state, stream_mode="values"):
+    print("=== Step ===")
+    for key, val in event.items():
+        print(f"{key}: {val}")
 
-# After invocation
-state = graph.get_state(config)
-print("Current values:", state.values)
-print("Next nodes:", state.next)
-print("Tasks:", state.tasks)
-
-# Full execution history
-for snapshot in graph.get_state_history(config):
-    print(f"Checkpoint: {snapshot.config['configurable']['checkpoint_id']}")
-    print(f"  Values: {snapshot.values}")
-    print(f"  Next: {snapshot.next}")
-    print()
-```
-
-### Step-by-step streaming
-
-```python
-# stream_mode="updates" shows per-node output
-for step in graph.stream(input, config, stream_mode="updates"):
-    node_name = list(step.keys())[0]
-    node_output = step[node_name]
-    print(f"[{node_name}] -> {node_output}")
-```
-
-### Add logging to nodes
-
-```python
+# ロギングを有効化
 import logging
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("langgraph")
-
-def my_node(state):
-    logger.debug(f"Entering my_node with state keys: {list(state.keys())}")
-    logger.debug(f"Messages count: {len(state.get('messages', []))}")
-    # ... node logic
-    result = {"count": state["count"] + 1}
-    logger.debug(f"my_node returning: {result}")
-    return result
 ```
 
----
+## 依存関係の確認
 
-## Performance Tuning
-
-### Recursion limit
-
-Default is 25. Set based on expected max iterations:
-```python
-# For complex multi-tool agents that need many steps
-config = {"recursion_limit": 100}
-```
-
-### Parallel tool execution
-
-Tools are executed sequentially by default in manual graphs. For parallel:
-```python
-import asyncio
-
-async def tool_node(state):
-    tool_calls = state["messages"][-1].tool_calls
-    tasks = [
-        asyncio.to_thread(tools_by_name[tc["name"]].invoke, tc["args"])
-        for tc in tool_calls
-    ]
-    results = await asyncio.gather(*tasks)
-    return {"messages": [
-        ToolMessage(content=json.dumps(r), name=tc["name"], tool_call_id=tc["id"])
-        for r, tc in zip(results, tool_calls)
-    ]}
-```
-
-Or use `create_react_agent` with `version="v1"` for built-in parallel tool execution.
-
-### Reduce state size
-
-Large states slow down checkpointing and serialization:
-```python
-class State(TypedDict):
-    messages: Annotated[list, add_messages]
-    # Don't store large objects (file contents, images) in state.
-    # Instead, store references (file paths, URLs).
-    file_path: str  # good: reference
-    # file_content: bytes  # bad: large blob in state
-```
-
-### Trim message history
-
-Prevent unbounded message growth:
-```python
-from langchain_core.messages import trim_messages
-
-def call_model(state):
-    trimmed = trim_messages(
-        state["messages"],
-        max_tokens=4000,
-        token_counter=model,
-        strategy="last",
-        include_system=True,
-    )
-    response = model.invoke(trimmed)
-    return {"messages": [response]}
-```
-
----
-
-## State Design Pitfalls
-
-### Reducer conflicts
-```python
-# Problem: Two parallel nodes both append to same list
-# without a reducer → last-write-wins, data lost
-
-# Solution: Use a reducer
-class State(TypedDict):
-    results: Annotated[list, lambda a, b: a + b]  # merge via concatenation
-```
-
-### Mutable default state
-```python
-# Problem: Sharing a mutable default
-DEFAULT = {"items": []}  # shared reference!
-
-# Solution: Create fresh state per invocation
-graph.invoke({"items": []})  # new list each time
-```
-
-### Overly broad state
-```python
-# Problem: Everything in one flat state
-class State(TypedDict):
-    messages: ...
-    user_name: str
-    user_email: str
-    draft: str
-    search_results: list
-    final_answer: str
-    error: str
-    retry_count: int
-    # ... 20 more fields
-
-# Better: Only include what's needed for routing and node communication
-class State(TypedDict):
-    messages: Annotated[list, add_messages]
-    phase: str  # "research" | "draft" | "review"
-    final_answer: str
-```
-
----
-
-## Checkpointer Issues
-
-### State not persisting (InMemorySaver)
-
-`InMemorySaver` is in-process only. State disappears when the process exits.
-For persistence across restarts, use `SqliteSaver` or `PostgresSaver`.
-
-### Thread ID collisions
-
-Different users sharing the same `thread_id` will see each other's state:
-```python
-# Wrong: static thread_id
-config = {"configurable": {"thread_id": "main"}}
-
-# Correct: unique per user/session
-import uuid
-config = {"configurable": {"thread_id": f"user-{user_id}-{uuid.uuid4()}"}}
-```
-
-### PostgresSaver connection pool exhaustion
-
-```python
-# Use connection pooling for concurrent access
-from langgraph.checkpoint.postgres import PostgresSaver
-from psycopg_pool import ConnectionPool
-
-pool = ConnectionPool("postgresql://user:pass@localhost/db", min_size=2, max_size=10)
-checkpointer = PostgresSaver(pool)
-```
-
----
-
-## Streaming Pitfalls
-
-### `stream_mode` confusion
-
-| Mode | Returns |
-|------|---------|
-| `"values"` | Full state after each node |
-| `"updates"` | Only the changes from each node |
-| `"messages"` | LLM token-level chunks |
-
-```python
-# Most common: see node-by-node progress
-for chunk in graph.stream(input, stream_mode="updates"):
-    print(chunk)
-
-# For real-time LLM output to users
-async for chunk in graph.astream(input, stream_mode="messages"):
-    if hasattr(chunk[0], "content") and chunk[0].content:
-        print(chunk[0].content, end="", flush=True)
-```
-
-### Missing async for astream
-
-```python
-# Wrong: using sync iteration with async stream
-for chunk in graph.astream(input):  # won't work
-    ...
-
-# Correct
-async for chunk in graph.astream(input):
-    ...
+```bash
+pip list | grep -E "langgraph|langchain"
+# 期待されるバージョン:
+# langgraph >= 1.0.0
+# langchain-openai >= 0.1.0
+# langchain-core >= 0.2.0
 ```
