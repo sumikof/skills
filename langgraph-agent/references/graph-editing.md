@@ -1,4 +1,4 @@
-# グラフ編集ガイド (LangGraph 1.0)
+# グラフ編集ガイド (LangGraph 1.0+)
 
 ユーザー指示に基づいて既存のLangGraphグラフにノード・エッジを追加・変更する手順。
 
@@ -40,7 +40,7 @@ print(app.get_graph().draw_mermaid())
 ```
 
 コードから把握するポイント:
-- `class State(TypedDict)` → 現在のStateフィールド一覧
+- `class State(TypedDict)` または `class State(MessagesState)` → 現在のStateフィールド一覧
 - `graph.add_node("名前", 関数)` → 既存ノード一覧
 - `graph.add_edge(A, B)` → 固定エッジ一覧
 - `graph.add_conditional_edges(A, func, {...})` → 条件分岐一覧
@@ -83,6 +83,23 @@ from langgraph.prebuilt import ToolNode
 tools = [search_tool, calc_tool]
 tool_node = ToolNode(tools)
 graph.add_node("tools", tool_node)  # ToolNodeはそのまま登録可能
+```
+
+### Command でステートを更新するノード
+
+```python
+from langgraph.types import Command
+
+def routing_node(state: State) -> Command:
+    """ステート更新と次のノード指定を同時に行う。"""
+    category = classify(state["messages"][-1].content)
+    return Command(
+        update={"category": category},
+        goto=category,  # 次のノード名を指定
+    )
+
+graph.add_node("router", routing_node)
+# Command.goto を使う場合、add_conditional_edges の代わりになる
 ```
 
 ---
@@ -205,12 +222,11 @@ graph.add_conditional_edges(
 
 ```python
 # 変更前
-class State(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
+class State(MessagesState):
+    pass
 
 # 変更後: フィールドを追加
-class State(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
+class State(MessagesState):
     # 新フィールド（デフォルト値はノード内で state.get("key", default) で対応）
     user_intent: str        # ユーザーの意図を分類
     confidence: float       # 信頼スコア
@@ -226,14 +242,16 @@ def my_node(state: State) -> dict:
     return {"retry_count": count + 1}
 ```
 
-`MessagesState` を継承している場合:
+### リデューサー付きフィールドの追加
+
+リストを蓄積するフィールドにはリデューサーを指定する。
 
 ```python
-from langgraph.graph import MessagesState
+import operator
+from typing import Annotated
 
 class State(MessagesState):
-    # messages は MessagesState が提供 (add_messages付き)
-    user_intent: str   # 追加フィールドのみ定義
+    results: Annotated[list[str], operator.add]  # 追加時にマージされる
 ```
 
 ---
@@ -286,14 +304,18 @@ graph.add_edge("logger", END)
 **ユーザー指示**: 「複数のアイテムを並列で処理したい」
 
 ```python
+import operator
+from typing import Annotated
+from typing_extensions import TypedDict
 from langgraph.types import Send
+from langgraph.graph import StateGraph, START, END
 
 class ParallelState(TypedDict):
     items: list[str]
     results: Annotated[list[str], operator.add]  # 並列結果をマージ
 
 def process_item(state: dict) -> dict:
-    """個別アイテムを処理する（サブグラフ的に動作）。"""
+    """個別アイテムを処理する。"""
     return {"results": [f"処理済み: {state['item']}"]}
 
 def fan_out(state: ParallelState) -> list[Send]:
@@ -304,4 +326,26 @@ graph = StateGraph(ParallelState)
 graph.add_node("process_item", process_item)
 graph.add_conditional_edges(START, fan_out, ["process_item"])
 graph.add_edge("process_item", END)
+```
+
+### パターン4: Command でルーティングとステート更新を同時に行う
+
+**ユーザー指示**: 「分類結果に応じてノードを振り分けつつ、分類結果も保存したい」
+
+```python
+from langgraph.types import Command
+
+def classifier(state: State) -> Command:
+    """入力を分類し、結果を保存しつつ適切なノードに振り分ける。"""
+    category = model.invoke(
+        f"classify: {state['messages'][-1].content}"
+    ).content.strip()
+    return Command(
+        update={"category": category},
+        goto=category,  # "technical" / "general" / "sales"
+    )
+
+graph.add_node("classifier", classifier)
+# Command.goto を使うため、add_conditional_edges は不要
+graph.add_edge(START, "classifier")
 ```

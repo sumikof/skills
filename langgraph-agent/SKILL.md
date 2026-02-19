@@ -1,11 +1,13 @@
 ---
 name: langgraph-agent
-description: "Create and customize AI agents using LangGraph 1.0 (Python) with OpenAI models. Sets up a Python project with pip/venv, then builds agents. Use when the user wants to: (1) create a new AI agent or chatbot, (2) build a ReAct agent with tool use, (3) design a custom multi-step graph workflow, (4) set up a new LangGraph project from scratch, (5) customize or modify an existing LangGraph graph based on user instructions, (6) implement patterns like multi-agent supervisor, human-in-the-loop, RAG pipeline, conditional routing, or iterative loops, (7) add nodes or edges to an existing graph ('〜の処理を追加したい', '〜の前後に処理を入れたい', '〜の場合は〜に進ませたい'). Supports ReAct pattern (prebuilt) and custom StateGraph construction."
+description: "Create and customize AI agents using LangGraph 1.0+ (Python). Sets up a Python project with pip/venv, then builds agents. Use when the user wants to: (1) create a new AI agent or chatbot, (2) build a ReAct agent with tool use, (3) design a custom multi-step graph workflow, (4) use the Functional API (@entrypoint/@task) for simple workflows, (5) set up a new LangGraph project from scratch, (6) customize or modify an existing LangGraph graph based on user instructions, (7) implement patterns like multi-agent supervisor/swarm, human-in-the-loop, RAG pipeline, conditional routing, or iterative loops, (8) add nodes or edges to an existing graph ('〜の処理を追加したい', '〜の前後に処理を入れたい', '〜の場合は〜に進ませたい'). Supports ReAct pattern (prebuilt), custom StateGraph construction, and Functional API."
 ---
 
 # LangGraph Agent
 
-LangGraph 1.0を使ったAIエージェントをPythonで構築するスキル。プロジェクトのセットアップからエージェント実装まで一貫してサポートする。
+LangGraph 1.0+を使ったAIエージェントをPythonで構築するスキル。プロジェクトのセットアップからエージェント実装まで一貫してサポートする。
+
+**必須環境**: Python 3.10以上
 
 ## ワークフロー
 
@@ -16,16 +18,19 @@ LangGraph 1.0を使ったAIエージェントをPythonで構築するスキル�
 
 ## プロジェクトセットアップ
 
-```bash
-# プロジェクトディレクトリを作成
-mkdir my-agent && cd my-agent
+**プロジェクトのルートディレクトリで実行すること。**
 
+```bash
 # 仮想環境を作成・有効化
 python3 -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# 依存関係をインストール
-pip install langgraph langchain-openai langchain-core
+# 基本依存関係をインストール
+pip install langgraph langchain-openai langchain-core python-dotenv
+
+# マルチエージェントが必要な場合:
+# pip install langgraph-supervisor  # Supervisorパターン
+# pip install langgraph-swarm       # Swarmパターン
 
 # .envファイルを作成
 echo "OPENAI_API_KEY=your-key-here" > .env
@@ -44,27 +49,64 @@ load_dotenv()
 |---|---|---|
 | ツール呼び出しで情報取得・タスク実行 | **ReActエージェント** | `references/react-agent.md` |
 | 複数ステップの独自ロジック・分岐フロー | **カスタムグラフ** | `references/custom-graph.md` |
+| シンプルなワークフロー（Pythonの制御フローで十分） | **Functional API** | `references/functional-api.md` |
 
 迷ったら**ReActエージェント**から始めること。シンプルで拡張しやすい。
 
-## LangGraph 1.0 共通事項
+## LangGraph 1.0+ 共通事項
+
+### モデルの指定方法
+
+```python
+# 方法1: モデルオブジェクト（従来の方法）
+from langchain_openai import ChatOpenAI
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+# 方法2: 文字列指定（create_react_agentで利用可能）
+agent = create_react_agent("openai:gpt-4o-mini", tools)
+```
+
+対応するモデル文字列の例:
+- `"openai:gpt-4o"`, `"openai:gpt-4o-mini"`
+- `"anthropic:claude-sonnet-4-5-20250929"`
+
+### ステート管理
 
 - `StateGraph` + `MessagesState` が基本構造
 - ノードは `state` を受け取り `dict` を返す純粋な関数
 - エッジで制御フローを定義（固定 or 条件分岐）
 - `graph.compile()` で実行可能なアプリを生成
-- 会話履歴の保持には `MemorySaver` チェックポインターを使用
+
+### 会話履歴の保持（チェックポインター）
 
 ```python
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.memory import InMemorySaver  # 開発用
 
-memory = MemorySaver()
+memory = InMemorySaver()
 app = graph.compile(checkpointer=memory)
 
 # スレッドIDで会話を管理
 config = {"configurable": {"thread_id": "user-123"}}
 result = app.invoke({"messages": [...]}, config=config)
 ```
+
+| チェックポインター | 用途 |
+|---|---|
+| `InMemorySaver` | 開発・テスト用（プロセス終了でデータ消失） |
+| `SqliteSaver` | ローカル開発（ファイルに永続化） |
+| `PostgresSaver` | 本番運用推奨 |
+
+### ストリーミング
+
+5つのストリームモードが利用可能。詳細は `references/streaming.md` を参照。
+
+| モード | 説明 |
+|---|---|
+| `"values"` | 各ステップ後の完全なステート |
+| `"updates"` | ステートの差分のみ |
+| `"messages"` | LLMトークンをリアルタイムに取得 |
+| `"custom"` | ノード内から任意のデータを送信 |
+| `"debug"` | 最大限の実行詳細 |
 
 ## テンプレートファイル
 
@@ -94,10 +136,11 @@ result = app.invoke({"messages": [...]}, config=config)
 | 「順番に」「手順A→B→C」 | シーケンシャルパイプライン |
 | 「内容によって」「振り分け」「分類」 | 条件分岐ルーター |
 | 「繰り返す」「満足するまで」「改善」 | ループ・反復処理 |
-| 「複数の専門家」「役割分担」 | マルチエージェント (Supervisor) |
+| 「複数の専門家」「役割分担」 | マルチエージェント (Supervisor/Swarm) |
 | 「人間の確認」「承認が必要」「中断」 | Human-in-the-loop |
 | 「共通処理を再利用」「モジュール化」 | サブグラフ |
 | 「ドキュメント検索」「RAG」「知識ベース」 | RAGパイプライン |
+| 「シンプルなフロー」「通常のPythonで十分」 | Functional API |
 
 複数のパターンを組み合わせることも可能（例:「分類→専門エージェント」）。
 
@@ -148,6 +191,8 @@ result = app.invoke({"messages": [...]}, config=config)
 
 - **ReActエージェント実装**: `references/react-agent.md`
 - **カスタムグラフ実装**: `references/custom-graph.md`
+- **Functional API**: `references/functional-api.md`
+- **ストリーミング**: `references/streaming.md`
 - **グラフパターンライブラリ**: `references/graph-patterns.md`（パターン別の完全なコード例）
 - **グラフ編集ガイド**: `references/graph-editing.md`（ノード・エッジ追加の具体的なコード例）
 - **トラブルシューティング**: `references/troubleshooting.md`

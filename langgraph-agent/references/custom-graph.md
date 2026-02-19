@@ -1,4 +1,4 @@
-# カスタムグラフ (LangGraph 1.0)
+# カスタムグラフ (LangGraph 1.0+)
 
 `StateGraph` を使った柔軟なカスタムグラフの実装ガイド。
 
@@ -49,6 +49,37 @@ result = app.invoke({
     "user_name": "太郎",
     "step_count": 0
 })
+```
+
+## MessagesState の使用（推奨）
+
+`MessagesState` を継承すると `messages` フィールド（`add_messages`リデューサー付き）が自動で含まれる。追加フィールドのみ定義すればよい。
+
+```python
+from langgraph.graph import MessagesState
+
+class State(MessagesState):
+    # messagesはすでに定義済み（add_messagesリデューサー付き）
+    user_context: str  # 追加フィールドのみ定義
+```
+
+## シーケンシャルな処理（add_sequence）
+
+固定順序のノードを簡潔に定義できる。
+
+```python
+graph = StateGraph(State)
+graph.add_sequence([step1, step2, step3])  # 関数を順番に実行
+# ↑ は以下と等価:
+# graph.add_node("step1", step1)
+# graph.add_node("step2", step2)
+# graph.add_node("step3", step3)
+# graph.add_edge(START, "step1")
+# graph.add_edge("step1", "step2")
+# graph.add_edge("step2", "step3")
+# graph.add_edge("step3", END)
+
+app = graph.compile()
 ```
 
 ## 条件分岐 (Conditional Edges)
@@ -111,16 +142,6 @@ graph.add_edge("tools", "model")  # ツール実行後モデルに戻る
 app = graph.compile()
 ```
 
-## MessagesState の使用（簡略版）
-
-```python
-from langgraph.graph import MessagesState  # add_messages付きのビルトインstate
-
-class State(MessagesState):
-    # messagesはすでに定義済み（add_messagesリデューサー付き）
-    user_context: str  # 追加フィールドのみ定義
-```
-
 ## 複数ノードのパイプライン
 
 ```python
@@ -152,7 +173,7 @@ graph.add_edge("analyze", "respond")
 graph.add_edge("respond", END)
 
 app = graph.compile()
-result = app.invoke({"raw_input": "AIエージェントとは？", "cleaned_input": "", "analysis": "", "final_response": ""})
+result = app.invoke({"raw_input": "AIエージェントとは？"})
 print(result["final_response"])
 ```
 
@@ -175,13 +196,14 @@ graph.add_conditional_edges(
 ## ステートの確認
 
 ```python
-# 実行後の中間状態を取得
-for step in app.stream(initial_state):
-    print(step)  # 各ノードの出力を表示
+# ストリーミングで各ステップの出力を確認
+for step in app.stream(initial_state, stream_mode="updates"):
+    for node_name, output in step.items():
+        print(f"[{node_name}] {output}")
 
 # チェックポインター使用時の状態取得
-from langgraph.checkpoint.memory import MemorySaver
-memory = MemorySaver()
+from langgraph.checkpoint.memory import InMemorySaver
+memory = InMemorySaver()
 app = graph.compile(checkpointer=memory)
 config = {"configurable": {"thread_id": "t1"}}
 app.invoke(initial_state, config=config)
@@ -191,10 +213,6 @@ print(state.values)
 
 ## グラフの可視化
 
-```bash
-pip install langgraph-studio  # または
-```
-
 ```python
 # ASCII表示
 print(app.get_graph().draw_ascii())
@@ -202,3 +220,21 @@ print(app.get_graph().draw_ascii())
 # Mermaid形式
 print(app.get_graph().draw_mermaid())
 ```
+
+## StateGraph のパラメータ一覧
+
+| パラメータ | 型 | 説明 |
+|---|---|---|
+| `state_schema` | `type[TypedDict]` | ステート定義（必須） |
+| `input_schema` | `type[TypedDict]` | 入力スキーマ（省略時はstate_schema） |
+| `output_schema` | `type[TypedDict]` | 出力スキーマ（省略時はstate_schema） |
+
+### compile() のパラメータ
+
+| パラメータ | 型 | 説明 |
+|---|---|---|
+| `checkpointer` | `BaseCheckpointSaver` | 会話履歴の保存先 |
+| `store` | `BaseStore` | スレッド横断の永続ストレージ |
+| `interrupt_before` | `list[str]` | 指定ノード実行前に中断 |
+| `interrupt_after` | `list[str]` | 指定ノード実行後に中断 |
+| `name` | `str` | グラフの識別名 |

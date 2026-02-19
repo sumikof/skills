@@ -1,8 +1,8 @@
 """
-カスタムグラフ テンプレート (LangGraph 1.0)
+カスタムグラフ テンプレート (LangGraph 1.0+)
 
 このテンプレートは以下のパターンを示します:
-  - カスタムステート定義
+  - MessagesStateを継承したカスタムステート定義
   - 複数ノードのパイプライン
   - 条件分岐エッジ
   - ツールノードの統合
@@ -14,33 +14,35 @@
 
 依存関係:
   pip install langgraph langchain-openai langchain-core python-dotenv
+
+必須: Python 3.10+
 """
 
-from typing import Annotated, Literal
-from typing_extensions import TypedDict
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
-from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import add_messages
+from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.memory import InMemorySaver
 
 load_dotenv()
 
 # ---- ステート定義 ----
-# ユーザの要件に合わせてフィールドを追加・変更してください
+# MessagesStateを継承すると messages フィールド（add_messagesリデューサー付き）が自動で含まれる
+# 追加フィールドのみ定義すればよい
 
-class State(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
+
+class State(MessagesState):
     # 追加フィールドの例:
     # user_intent: str       # ユーザの意図を分類
     # context: str           # 追加コンテキスト
     # iteration_count: int   # ループ回数管理
+    pass
 
 
 # ---- ツール定義 ----
+
 
 @tool
 def search(query: str) -> str:
@@ -68,6 +70,7 @@ model_with_tools = model.bind_tools(tools)
 SYSTEM_PROMPT = """あなたは役立つAIアシスタントです。
 ユーザの質問に対して、必要に応じてツールを使いながら丁寧に回答してください。"""
 
+
 def call_model(state: State) -> dict:
     """LLMを呼び出すノード。"""
     messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
@@ -80,6 +83,7 @@ tool_node = ToolNode(tools)
 
 
 # ---- グラフ構築 ----
+
 
 def build_graph() -> StateGraph:
     """グラフを構築してコンパイル済みアプリを返す。"""
@@ -107,8 +111,9 @@ def build_graph() -> StateGraph:
 def main():
     graph = build_graph()
 
-    # チェックポインターで会話履歴を保持
-    memory = MemorySaver()
+    # チェックポインターで会話履歴を保持（開発用）
+    # 本番では SqliteSaver や PostgresSaver を使用
+    memory = InMemorySaver()
     app = graph.compile(checkpointer=memory)
 
     # グラフ構造を確認（デバッグ用）
@@ -127,12 +132,18 @@ def main():
             print("終了します。")
             break
 
-        result = app.invoke(
+        # ストリーミングで各ステップを表示
+        for step in app.stream(
             {"messages": [HumanMessage(content=user_input)]},
             config=config,
-        )
+            stream_mode="updates",
+        ):
+            for node_name, output in step.items():
+                if "messages" in output:
+                    last = output["messages"][-1]
+                    if hasattr(last, "content") and last.content:
+                        print(f"[{node_name}] {last.content}")
 
-        print(f"Agent: {result['messages'][-1].content}")
         print()
 
 
