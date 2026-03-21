@@ -36,7 +36,7 @@
           "evidence": ""
         },
         {
-          "text": "--db FM08 かつ為替系列コード（FXUSDMまたは類似）が引数に含まれる",
+          "text": "--db FM08 かつ正しい為替系列コード（FXERM07等）が引数に含まれる（FXUSDMは誤コードなので不可）",
           "passed": null,
           "evidence": ""
         },

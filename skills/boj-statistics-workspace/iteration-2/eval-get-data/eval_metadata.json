@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-get-data",
+  "prompt": "USD/JPYの為替レート（月次）を2024年分取得して表示してください。日銀APIを使って。",
+  "assertions": [
+    {
+      "text": "get_data.pyが実行された（出力にデータ取得の証拠がある）",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "--db FM08 かつ正しい為替系列コード（FXERM07等）が引数に含まれる（FXUSDMは誤コードなので不可）",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "--start 202401 または --end 202412 相当の期間指定が含まれる",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "日付とデータ値のテーブルまたは適切なエラーメッセージが出力に含まれる",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}

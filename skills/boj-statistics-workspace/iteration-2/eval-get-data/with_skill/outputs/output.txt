@@ -1,0 +1,22 @@
+$ source .venv/bin/activate && python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERM07 --start 202401 --end 202412
+
+DB 'FM08' / 系列: FXERM07 (202401〜202412) のデータを取得中...
+通信エラー: HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getDataCode?format=json&lang=jp&db=FM08&code=FXERM07&startDate=202401&endDate=202412 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+
+Exit code: 1
+
+---
+エラー内容:
+日銀API（stat-search.boj.or.jp）への接続がプロキシによってブロックされました。
+このサンドボックス環境では外部ネットワークへのアクセスが制限されているため、APIリクエストが失敗しています。
+
+使用したコマンド:
+  python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERM07 --start 202401 --end 202412
+
+スキルの指示に基づく操作:
+- DB: FM08（外国為替データベース）
+- 系列コード: FXERM07（ドル・円 月中平均レート）
+- 期間: 2024年1月〜2024年12月（月次）
+- APIエンドポイント: https://www.stat-search.boj.or.jp/api/v1/getDataCode
+
+ネットワークが利用可能な環境では上記コマンドで2024年の月次USD/JPYレートが取得できます。
