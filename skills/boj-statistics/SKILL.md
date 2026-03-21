@@ -48,9 +48,10 @@ pip install requests pandas
 
 | やりたいこと | スクリプト | 使用例 |
 |---|---|---|
-| 系列コードを探す・一覧を見る | `search_series.py` | `--db FM08 --keyword "USD"` |
-| 特定系列のデータを取得 | `get_data.py` | `--db FM08 --code FXUSDM --start 202401` |
-| 複数系列を同時取得 | `get_data.py` | `--code FXUSDM,FXEURM --start 202001` |
+| 系列コードを探す・一覧を見る | `search_series.py` | `--db FM08 --keyword "ドル"` |
+| USD/JPY月次データを取得 | `get_data.py` | `--db FM08 --code FXERM07 --start 202401` |
+| USD/JPY日次データを取得 | `get_data.py` | `--db FM08 --code FXERD04 --start 20240101` |
+| 複数系列を同時取得 | `get_data.py` | `--code FXERM07,FXERM06 --start 202001` |
 | カテゴリ階層でまとめて取得 | `get_layer.py` | `--db FM08 --layer1 USD --frequency M` |
 
 ## スクリプト詳細
@@ -77,17 +78,20 @@ python skills/boj-statistics/scripts/search_series.py --db IR01 --keyword "overn
 **使用API:** `getDataCode`
 
 ```bash
-# USD/JPY月次データ（2024年）
-python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXUSDM --start 202401 --end 202412
+# USD/JPY月次データ（2024年）—— FXERM07 = ドル・円 月中平均
+python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERM07 --start 202401 --end 202412
 
-# 複数系列を同時取得
-python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXUSDM,FXEURM --start 202001
+# USD/JPY日次データ —— FXERD04 = ドル・円 17時時点
+python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERD04 --start 20240101 --end 20241231
+
+# 複数系列を同時取得（同一頻度のみ可）
+python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERM07,FXERM06 --start 202001
 
 # CSV保存
-python skills/boj-statistics/scripts/get_data.py --db MD02 --code MD02MABJMTA --output result.csv
+python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERM07 --start 202001 --output result.csv
 
 # 英語表示
-python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXUSDM --lang en
+python skills/boj-statistics/scripts/get_data.py --db FM08 --code FXERM07 --lang en
 ```
 
 **制限:** 1リクエスト最大250系列 / 60,000データポイント（自動ページネーション対応）
