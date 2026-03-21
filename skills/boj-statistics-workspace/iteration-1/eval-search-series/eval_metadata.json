@@ -1,0 +1,22 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-search-series",
+  "prompt": "日銀APIを使ってFM08データベースのUSD関連の系列を調べて、どんな系列コードがあるか教えてください",
+  "assertions": [
+    {
+      "text": "search_series.pyが実行された（出力に系列検索の証拠がある）",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "DB='FM08'かつkeyword='USD'相当の引数でコマンドが実行された",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "系列コードまたはそれに準ずる情報が出力に含まれる（エラーメッセージか一覧のいずれか）",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}

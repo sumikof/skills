@@ -1,0 +1,79 @@
+{
+  "skill_name": "boj-statistics",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "日銀APIを使ってFM08データベースのUSD関連の系列を調べて、どんな系列コードがあるか教えてください",
+      "expected_output": "search_series.pyを実行し、FM08データベースのUSD関連系列コードと名称の一覧（表形式）が表示される。系列コード・名称・頻度・期間が含まれる。",
+      "files": [],
+      "assertions": [
+        {
+          "text": "search_series.pyが実行された（出力に系列検索の証拠がある）",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "DB='FM08'かつkeyword='USD'相当の引数でコマンドが実行された",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "系列コードまたはそれに準ずる情報が出力に含まれる（エラーメッセージか一覧のいずれか）",
+          "passed": null,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "USD/JPYの為替レート（月次）を2024年分取得して表示してください。日銀APIを使って。",
+      "expected_output": "get_data.pyを実行し、FM08データベースのUSD/JPY月次為替レートデータが表形式で表示される。日付（2024年各月）と値が含まれる。",
+      "files": [],
+      "assertions": [
+        {
+          "text": "get_data.pyが実行された（出力にデータ取得の証拠がある）",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "--db FM08 かつ為替系列コード（FXUSDMまたは類似）が引数に含まれる",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "--start 202401 または --end 202412 相当の期間指定が含まれる",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "日付とデータ値のテーブルまたは適切なエラーメッセージが出力に含まれる",
+          "passed": null,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "日銀APIのgetDataLayerを使って、FM08データベースのUSDカテゴリの月次データをまとめて取得してCSVに保存してください",
+      "expected_output": "get_layer.pyを実行し、FM08データベースのUSレイヤー1、月次頻度でデータが取得される。CSVファイルが生成される。",
+      "files": [],
+      "assertions": [
+        {
+          "text": "get_layer.pyが実行された（出力にgetDataLayer使用の証拠がある）",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "--db FM08 --layer1 USD --frequency M 相当の引数が含まれる",
+          "passed": null,
+          "evidence": ""
+        },
+        {
+          "text": "--output オプションでCSVファイルが指定・保存された（またはエラーメッセージが表示された）",
+          "passed": null,
+          "evidence": ""
+        }
+      ]
+    }
+  ]
+}
