@@ -1,0 +1,3 @@
+データ取得中: DB='FM08', layer1=USD, 頻度=M
+通信エラー: HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getDataLayer?format=json&lang=jp&db=FM08&layer1=USD&frequency=M (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+EXIT_CODE: 1
