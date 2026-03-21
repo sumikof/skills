@@ -1,0 +1,9 @@
+=== get_race_entry.py 202506010111 ===
+出走表を取得中... (race_id: 202506010111)
+通信エラー: HTTPSConnectionPool(host='race.netkeiba.com', port=443): Max retries exceeded with url: /race/shutuba.html?race_id=202506010111 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+EXIT_CODE: 1
+
+=== get_odds.py 202506010111 ===
+オッズを取得中... (race_id: 202506010111)
+通信エラー: HTTPSConnectionPool(host='race.netkeiba.com', port=443): Max retries exceeded with url: /api/api_get_jra_odds.html?race_id=202506010111&type=b1&action=update (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+EXIT_CODE: 1

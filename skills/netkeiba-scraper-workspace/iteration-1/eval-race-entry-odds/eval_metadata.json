@@ -1,0 +1,22 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-race-entry-odds",
+  "prompt": "netkeibaで2025年1月5日に中山競馬場で開催された第11レース（race_id: 202506010111）の出走表と、出走馬のオッズを調べてください。",
+  "assertions": [
+    {
+      "text": "get_race_entry.pyが実行された",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "get_odds.pyが実行された",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "出走表またはオッズ情報（あるいはエラーメッセージ）が出力された",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}
