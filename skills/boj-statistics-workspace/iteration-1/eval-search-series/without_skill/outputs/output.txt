@@ -1,66 +1,144 @@
 ======================================================================
 日銀API FM08データベース USD関連系列調査
-実行日時: 2026-03-21 06:18:38
+実行日時: 2026-03-21
+調査方法: WebSearch + GitHub/公式ドキュメント調査（Pythonスクリプト実行試み）
 ======================================================================
 
-============================================================
-1. FM08メタデータ検索 - キーワード: 米ドル
-============================================================
+【調査の背景】
+日銀時系列統計API (https://www.stat-search.boj.or.jp/api/v1) へのPythonスクリプトによる
+直接アクセスを試みたが、実行環境のプロキシ制限（許可ホストリストに
+stat-search.boj.or.jp が含まれていない）により接続不可（403 Forbidden）。
+代替手段としてWebSearchによる文献調査を実施した。
 
-[API呼び出し] GET https://www.stat-search.boj.or.jp/api/v1/getMetadata
-  パラメータ: {'db': 'FM08', 'lang': 'jp', 'format': 'json', 'keyword': '米ドル'}
-Traceback (most recent call last):
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 773, in urlopen
-    self._prepare_proxy(conn)
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 1042, in _prepare_proxy
-    conn.connect()
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 776, in connect
-    self._tunnel()
-  File "/usr/lib/python3.12/http/client.py", line 999, in _tunnel
-    raise OSError(f"Tunnel connection failed: {code} {message.strip()}")
-OSError: Tunnel connection failed: 403 Forbidden
+【Pythonスクリプト実行エラー詳細】
+  実行したスクリプト: search_fm08_usd.py
+  エラー: requests.exceptions.ProxyError:
+    HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443):
+    Max retries exceeded (Caused by ProxyError('Unable to connect to proxy',
+    OSError('Tunnel connection failed: 403 Forbidden')))
 
-The above exception was the direct cause of the following exception:
+  原因: GLOBAL_AGENT_HTTP_PROXY の allowed_hosts に
+        stat-search.boj.or.jp が含まれていない
 
-urllib3.exceptions.ProxyError: ('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))
+======================================================================
+FM08データベース概要
+======================================================================
 
-The above exception was the direct cause of the following exception:
+DBコード: FM08
+DB名称: 外国為替市況 (Foreign Exchange Market Conditions)
+APIエンドポイント例:
+  https://www.stat-search.boj.or.jp/api/v1/getMetadata?db=FM08&lang=jp&format=csv
 
-Traceback (most recent call last):
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/requests/adapters.py", line 644, in send
-    resp = conn.urlopen(
-           ^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 841, in urlopen
-    retries = retries.increment(
-              ^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/urllib3/util/retry.py", line 535, in increment
-    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getMetadata?db=FM08&lang=jp&format=json&keyword=%E7%B1%B3%E3%83%89%E3%83%AB (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+【日銀APIの主なエンドポイント】
+  - getMetadata: https://www.stat-search.boj.or.jp/api/v1/getMetadata
+  - getDataCode:  https://www.stat-search.boj.or.jp/api/v1/getDataCode
+  - getDataLayer: https://www.stat-search.boj.or.jp/api/v1/getDataLayer
 
-During handling of the above exception, another exception occurred:
+======================================================================
+FM08 USD関連系列コード一覧（調査結果）
+======================================================================
 
-Traceback (most recent call last):
-  File "/home/user/skills/skills/boj-statistics-workspace/iteration-1/eval-search-series/without_skill/search_fm08_usd.py", line 229, in <module>
-    main()
-  File "/home/user/skills/skills/boj-statistics-workspace/iteration-1/eval-search-series/without_skill/search_fm08_usd.py", line 80, in main
-    resp = get_metadata(db="FM08", keyword="米ドル", lang="jp", fmt="json")
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/skills/boj-statistics-workspace/iteration-1/eval-search-series/without_skill/search_fm08_usd.py", line 31, in get_metadata
-    resp = requests.get(url, params=params, timeout=30)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/requests/api.py", line 73, in get
-    return request("get", url, params=params, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/requests/api.py", line 59, in request
-    return session.request(method=method, url=url, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
-    resp = self.send(prep, **send_kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/requests/sessions.py", line 703, in send
-    r = adapter.send(request, **kwargs)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/skills/.venv/lib/python3.12/site-packages/requests/adapters.py", line 671, in send
-    raise ProxyError(e, request=request)
-requests.exceptions.ProxyError: HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getMetadata?db=FM08&lang=jp&format=json&keyword=%E7%B1%B3%E3%83%89%E3%83%AB (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+キーワード「ドル」でのメタデータ検索結果（計39系列確認）
+参照元: https://github.com/miwamasa/BOJ_API
+
+------------------------------------------------------------
+【日次系列 (DAILY) - FXERD系列】  ドル・円関連
+------------------------------------------------------------
+系列コード  | 系列名称（日本語）
+------------|--------------------------------------------------
+FXERD01     | 東京市場 ドル・円 スポット 9時時点
+FXERD02     | 東京市場 ドル・円 スポット 最高値
+FXERD03     | 東京市場 ドル・円 スポット 最安値
+FXERD04     | 東京市場 ドル・円 スポット 17時時点
+FXERD05     | 東京市場 ドル・円 スポット 中心相場
+FXERD06     | 東京市場 ドル・円 スポット 出来高
+FXERD07     | 東京市場 ドル・円 スワップ出来高
+FXERD11     | （更新停止）東京市場 ドル・円 フォワード・スプレッド1ヵ月（2010年2月26日まで）
+FXERD12     | （更新停止）東京市場 ドル・円 フォワード・スプレッド3ヵ月（2010年2月26日まで）
+FXERD13     | （更新停止）東京市場 ドル・円 フォワード・スプレッド1ヵ月 年率（2010年2月26日まで）
+
+------------------------------------------------------------
+【日次系列 (DAILY) - FXERD系列】  ユーロ・ドル関連
+------------------------------------------------------------
+系列コード  | 系列名称（日本語）
+------------|--------------------------------------------------
+FXERD31     | 東京市場 ユーロ・ドル スポット 9時時点
+FXERD32     | 東京市場 ユーロ・ドル スポット 最高値
+FXERD33     | 東京市場 ユーロ・ドル スポット 最安値
+FXERD34     | 東京市場 ユーロ・ドル スポット 17時時点
+FXERD35     | 東京市場 ユーロ・ドル スポット 出来高
+FXERD36     | 東京市場 ユーロ・ドル スワップ出来高
+FXERD37     | （更新停止）東京市場 ドル・円 オプション出来高（2012年1月31日まで）
+FXERD38     | （更新停止）東京市場 ユーロ・ドル オプション出来高（2012年1月31日まで）
+
+------------------------------------------------------------
+【月次系列 (MONTHLY) - FXERM系列】  ドル・円関連
+------------------------------------------------------------
+系列コード  | 系列名称（日本語）
+------------|--------------------------------------------------
+FXERM06     | 東京市場 ドル・円 スポット 17時時点 月末
+            | 為替相場（東京インターバンク相場）（月次）
+            | 単位: 1ドルにつき円
+FXERM07     | 東京市場 ドル・円 スポット 17時時点 月中平均
+            | 為替相場（東京インターバンク相場）（月次）
+            | US Dollar/Yen Spot Rate at 17:00 in JST,
+            | Average in the Month, Yen per U.S. Dollar
+
+======================================================================
+系列コードの命名規則
+======================================================================
+
+FX + ER + D/M + 番号
+  FX  = Foreign eXchange（外国為替）
+  ER  = Exchange Rate（為替レート）
+  D   = Daily（日次）
+  M   = Monthly（月次）
+  番号 = 01-13がドル・円関連（日次）
+         31-38がユーロ・ドル関連（日次）
+         06, 07がドル・円関連（月次）
+
+FM08データベースの系列コードは以下の形式で指定する:
+  FM08'FXERD04  （日次 ドル・円 17時時点）
+  FM08'FXERM07  （月次 ドル・円 月中平均）
+
+======================================================================
+注意事項
+======================================================================
+
+1. よくある間違い:
+   - FXUSDM（存在しない）→ 正しくは FXERM07（月次月中平均）
+   - FXUSD （存在しない）→ 正しくは FXERD04（日次17時時点）
+
+2. 系列コードは時代とともに変更・廃止されることがある。
+   常に getMetadata APIでキーワード検索して最新の系列コードを確認すること。
+
+   確認コマンド例（APIが利用可能な場合）:
+   GET https://www.stat-search.boj.or.jp/api/v1/getMetadata?db=FM08&keyword=ドル&lang=jp&format=csv
+
+3. キーワード「ドル」でFM08を検索すると合計39系列が見つかる（2024年時点）
+
+4. コードAPIで複数系列を一度に取得する場合、全系列が同一期種（日次・月次等）
+   でなければならない制約がある
+
+5. 現在もアクティブな主要USD系列:
+   - FXERD01: 日次 9時時点
+   - FXERD04: 日次 17時時点  ← 最もよく使われる日次系列
+   - FXERM07: 月次 月中平均  ← 最もよく使われる月次系列
+   - FXERM06: 月次 月末値
+
+======================================================================
+参照情報
+======================================================================
+
+- 日銀APIマニュアル（日本語）: https://www.stat-search.boj.or.jp/info/api_manual.pdf
+- 日銀APIマニュアル（英語）: https://www.stat-search.boj.or.jp/info/api_manual_en.pdf
+- FM08主要時系列統計データ表（月次）: https://www.stat-search.boj.or.jp/ssi/mtshtml/fm08_m_1.html
+- FM08主要時系列統計データ表（英語）: https://www.stat-search.boj.or.jp/ssi/mtshtml/fm08_m_1_en.html
+- FM08統計別検索: https://www.stat-search.boj.or.jp/ssi/cgi-bin/famecgi2?cgi=$nme_a000&lstSelection=FM08
+- BOJ_API GitHubリポジトリ: https://github.com/miwamasa/BOJ_API
+- delihiros/boj-api-client: https://github.com/delihiros/boj-api-client
+- 外国為替市況（日次）一覧: https://www.boj.or.jp/statistics/market/forex/fxdaily/fxlist/index.htm
+
+======================================================================
+調査完了
+======================================================================

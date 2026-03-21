@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-get-data",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "get_data.pyが実行された（出力にデータ取得の証拠がある）",
+      "passed": true,
+      "evidence": "「DB 'FM08' / 系列: FXUSDM (202401〜202412) のデータを取得中...」が出力されており、get_data.py が正しく起動した"
+    },
+    {
+      "text": "--db FM08 かつ為替系列コード（FXUSDMまたは類似）が引数に含まれる",
+      "passed": false,
+      "evidence": "FXUSDM を使用したが、これは存在しない系列コード。正しくは FXERM07。SKILL.md に誤った系列コード例が記載されていたため"
+    },
+    {
+      "text": "--start 202401 または --end 202412 相当の期間指定が含まれる",
+      "passed": true,
+      "evidence": "startDate=202401, endDate=202412 が正しく指定された"
+    },
+    {
+      "text": "日付とデータ値のテーブルまたは適切なエラーメッセージが出力に含まれる",
+      "passed": true,
+      "evidence": "通信エラーが適切に表示された（ネットワーク制限のため）"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.75,
+    "passed": 3,
+    "failed": 1,
+    "total": 4
+  },
+  "notes": "スクリプトを即座に特定・実行（26 tool uses, 107秒）。重大な問題：SKILL.mdに記載のFXUSDMが誤り。正しいコードはFXERM07（iteration-2で修正必要）"
+}

@@ -1,0 +1,29 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-search-series",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "search_series.pyが実行された（出力に系列検索の証拠がある）",
+      "passed": false,
+      "evidence": "search_series.py は使用されず、独自の search_fm08_usd.py を作成した"
+    },
+    {
+      "text": "DB='FM08'かつkeyword='USD'相当の引数でコマンドが実行された",
+      "passed": true,
+      "evidence": "独自スクリプトで db=FM08, keyword=USD 相当の処理を実行し、さらにWebSearchで補完した"
+    },
+    {
+      "text": "系列コードまたはそれに準ずる情報が出力に含まれる（エラーメッセージか一覧のいずれか）",
+      "passed": true,
+      "evidence": "WebSearchでFXERD01-07, FXERM06, FXERM07等の系列コード一覧を取得・出力した（34 tool uses使用）"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.667,
+    "passed": 2,
+    "failed": 1,
+    "total": 3
+  },
+  "notes": "スクリプトを自力で作成（34 tool uses, 417秒）。WebSearchで正確な系列コード（FXERM07等）を発見。FXUSDMが誤りであることも正しく指摘した"
+}

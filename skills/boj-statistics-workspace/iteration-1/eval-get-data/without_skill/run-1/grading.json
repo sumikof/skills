@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-get-data",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "get_data.pyが実行された（出力にデータ取得の証拠がある）",
+      "passed": false,
+      "evidence": "get_data.py は使用されず、独自スクリプト /tmp/fetch_usdjpy.py を作成した"
+    },
+    {
+      "text": "--db FM08 かつ為替系列コード（FXUSDMまたは類似）が引数に含まれる",
+      "passed": true,
+      "evidence": "WebSearch調査で FXERM07 を正しく特定し使用した（FXUSDMではなく正しいコード）"
+    },
+    {
+      "text": "--start 202401 または --end 202412 相当の期間指定が含まれる",
+      "passed": true,
+      "evidence": "startDate=202401, endDate=202412 が正しく指定された"
+    },
+    {
+      "text": "日付とデータ値のテーブルまたは適切なエラーメッセージが出力に含まれる",
+      "passed": true,
+      "evidence": "ネットワークエラーに加え、WebSearchで取得した2024年1月〜12月のUSD/JPY参照データを出力した"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.75,
+    "passed": 3,
+    "failed": 1,
+    "total": 4
+  },
+  "notes": "スクリプトをゼロから作成（22 tool uses, 223秒）。WebSearchで正しいFXERM07を発見・使用。参照データもWebSearchから出力した"
+}

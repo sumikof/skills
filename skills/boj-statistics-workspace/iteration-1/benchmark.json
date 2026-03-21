@@ -1,0 +1,273 @@
+{
+  "metadata": {
+    "skill_name": "boj-statistics",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-03-21T06:25:39Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4,
+        "time_seconds": 107.3,
+        "tokens": 25559,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_data.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306b\u30c7\u30fc\u30bf\u53d6\u5f97\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": true,
+          "evidence": "\u300cDB 'FM08' / \u7cfb\u5217: FXUSDM (202401\u301c202412) \u306e\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d...\u300d\u304c\u51fa\u529b\u3055\u308c\u3066\u304a\u308a\u3001get_data.py \u304c\u6b63\u3057\u304f\u8d77\u52d5\u3057\u305f"
+        },
+        {
+          "text": "--db FM08 \u304b\u3064\u70ba\u66ff\u7cfb\u5217\u30b3\u30fc\u30c9\uff08FXUSDM\u307e\u305f\u306f\u985e\u4f3c\uff09\u304c\u5f15\u6570\u306b\u542b\u307e\u308c\u308b",
+          "passed": false,
+          "evidence": "FXUSDM \u3092\u4f7f\u7528\u3057\u305f\u304c\u3001\u3053\u308c\u306f\u5b58\u5728\u3057\u306a\u3044\u7cfb\u5217\u30b3\u30fc\u30c9\u3002\u6b63\u3057\u304f\u306f FXERM07\u3002SKILL.md \u306b\u8aa4\u3063\u305f\u7cfb\u5217\u30b3\u30fc\u30c9\u4f8b\u304c\u8a18\u8f09\u3055\u308c\u3066\u3044\u305f\u305f\u3081"
+        },
+        {
+          "text": "--start 202401 \u307e\u305f\u306f --end 202412 \u76f8\u5f53\u306e\u671f\u9593\u6307\u5b9a\u304c\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "startDate=202401, endDate=202412 \u304c\u6b63\u3057\u304f\u6307\u5b9a\u3055\u308c\u305f"
+        },
+        {
+          "text": "\u65e5\u4ed8\u3068\u30c7\u30fc\u30bf\u5024\u306e\u30c6\u30fc\u30d6\u30eb\u307e\u305f\u306f\u9069\u5207\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u51fa\u529b\u306b\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "\u901a\u4fe1\u30a8\u30e9\u30fc\u304c\u9069\u5207\u306b\u8868\u793a\u3055\u308c\u305f\uff08\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u5236\u9650\u306e\u305f\u3081\uff09"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 47.8,
+        "tokens": 29929,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_layer.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306bgetDataLayer\u4f7f\u7528\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": true,
+          "evidence": "\u300c\u30c7\u30fc\u30bf\u53d6\u5f97\u4e2d: DB='FM08', layer1=USD, \u983b\u5ea6=M\u300d\u304c\u51fa\u529b\u3055\u308c\u3066\u304a\u308a\u3001get_layer.py \u304c\u6b63\u3057\u304f\u8d77\u52d5\u3057\u305f"
+        },
+        {
+          "text": "--db FM08 --layer1 USD --frequency M \u76f8\u5f53\u306e\u5f15\u6570\u304c\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "URL\u306bdb=FM08, layer1=USD, frequency=M \u304c\u542b\u307e\u308c\u3066\u304a\u308a\u3001\u5168\u30d1\u30e9\u30e1\u30fc\u30bf\u304c\u6b63\u3057\u304f\u6307\u5b9a\u3055\u308c\u305f"
+        },
+        {
+          "text": "--output \u30aa\u30d7\u30b7\u30e7\u30f3\u3067CSV\u30d5\u30a1\u30a4\u30eb\u304c\u6307\u5b9a\u30fb\u4fdd\u5b58\u3055\u308c\u305f\uff08\u307e\u305f\u306f\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u8868\u793a\u3055\u308c\u305f\uff09",
+          "passed": true,
+          "evidence": "\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u304c --output fm08_usd_monthly.csv \u3092\u6307\u5b9a\u3057\u3066\u5b9f\u884c\u3002\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u5236\u9650\u3067CSV\u306f\u672a\u751f\u6210\u3060\u304c\u9069\u5207\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u8868\u793a\u3055\u308c\u305f"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 67.4,
+        "tokens": 30045,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "search_series.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306b\u7cfb\u5217\u691c\u7d22\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": true,
+          "evidence": "\u300cDB 'FM08' \u306e\u7cfb\u5217\u30e1\u30bf\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u4e2d...\u300d\u304c\u51fa\u529b\u3055\u308c\u3066\u304a\u308a\u3001search_series.py \u304c\u6b63\u3057\u304f\u8d77\u52d5\u3057\u305f"
+        },
+        {
+          "text": "DB='FM08'\u304b\u3064keyword='USD'\u76f8\u5f53\u306e\u5f15\u6570\u3067\u30b3\u30de\u30f3\u30c9\u304c\u5b9f\u884c\u3055\u308c\u305f",
+          "passed": true,
+          "evidence": "URL\u306b db=FM08 \u304c\u542b\u307e\u308c\u3066\u3044\u308b\u3002keyword\u306fgetMetadata\u306eAPI\u30d1\u30e9\u30e1\u30fc\u30bf\u3067\u306f\u306a\u304f\u30ed\u30fc\u30ab\u30eb\u30d5\u30a3\u30eb\u30bf\u306a\u306e\u3067URL\u5916\u3067\u9069\u7528\u3055\u308c\u308b\u60f3\u5b9a"
+        },
+        {
+          "text": "\u7cfb\u5217\u30b3\u30fc\u30c9\u307e\u305f\u306f\u305d\u308c\u306b\u6e96\u305a\u308b\u60c5\u5831\u304c\u51fa\u529b\u306b\u542b\u307e\u308c\u308b\uff08\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304b\u4e00\u89a7\u306e\u3044\u305a\u308c\u304b\uff09",
+          "passed": true,
+          "evidence": "\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u5236\u9650\u306e\u305f\u3081\u300c\u901a\u4fe1\u30a8\u30e9\u30fc\u300d\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u8868\u793a\u3055\u308c\u305f\u3002\u30a8\u30e9\u30fc\u30cf\u30f3\u30c9\u30ea\u30f3\u30b0\u304c\u9069\u5207\u306b\u6a5f\u80fd\u3057\u3066\u3044\u308b"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4,
+        "time_seconds": 222.9,
+        "tokens": 32404,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_data.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306b\u30c7\u30fc\u30bf\u53d6\u5f97\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": false,
+          "evidence": "get_data.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001\u72ec\u81ea\u30b9\u30af\u30ea\u30d7\u30c8 /tmp/fetch_usdjpy.py \u3092\u4f5c\u6210\u3057\u305f"
+        },
+        {
+          "text": "--db FM08 \u304b\u3064\u70ba\u66ff\u7cfb\u5217\u30b3\u30fc\u30c9\uff08FXUSDM\u307e\u305f\u306f\u985e\u4f3c\uff09\u304c\u5f15\u6570\u306b\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "WebSearch\u8abf\u67fb\u3067 FXERM07 \u3092\u6b63\u3057\u304f\u7279\u5b9a\u3057\u4f7f\u7528\u3057\u305f\uff08FXUSDM\u3067\u306f\u306a\u304f\u6b63\u3057\u3044\u30b3\u30fc\u30c9\uff09"
+        },
+        {
+          "text": "--start 202401 \u307e\u305f\u306f --end 202412 \u76f8\u5f53\u306e\u671f\u9593\u6307\u5b9a\u304c\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "startDate=202401, endDate=202412 \u304c\u6b63\u3057\u304f\u6307\u5b9a\u3055\u308c\u305f"
+        },
+        {
+          "text": "\u65e5\u4ed8\u3068\u30c7\u30fc\u30bf\u5024\u306e\u30c6\u30fc\u30d6\u30eb\u307e\u305f\u306f\u9069\u5207\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u51fa\u529b\u306b\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u30a8\u30e9\u30fc\u306b\u52a0\u3048\u3001WebSearch\u3067\u53d6\u5f97\u3057\u305f2024\u5e741\u6708\u301c12\u6708\u306eUSD/JPY\u53c2\u7167\u30c7\u30fc\u30bf\u3092\u51fa\u529b\u3057\u305f"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.333,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 330.8,
+        "tokens": 56339,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_layer.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306bgetDataLayer\u4f7f\u7528\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": false,
+          "evidence": "get_layer.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001/tmp/boj_get_layer.py \u3092\u72ec\u81ea\u4f5c\u6210\u3057\u305f"
+        },
+        {
+          "text": "--db FM08 --layer1 USD --frequency M \u76f8\u5f53\u306e\u5f15\u6570\u304c\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "\u72ec\u81ea\u30b9\u30af\u30ea\u30d7\u30c8\u3067 db=FM08, layer1=USD, frequency=M \u3092\u6b63\u3057\u304f\u6307\u5b9a\u3057\u305f"
+        },
+        {
+          "text": "--output \u30aa\u30d7\u30b7\u30e7\u30f3\u3067CSV\u30d5\u30a1\u30a4\u30eb\u304c\u6307\u5b9a\u30fb\u4fdd\u5b58\u3055\u308c\u305f\uff08\u307e\u305f\u306f\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u8868\u793a\u3055\u308c\u305f\uff09",
+          "passed": false,
+          "evidence": "CSV\u51fa\u529b\u306e\u5f15\u6570\u6307\u5b9a\u304c\u306a\u304f\u3001\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u30a8\u30e9\u30fc\u306e\u307f\u51fa\u529b\u3055\u308c\u305f\u3002CSV\u4fdd\u5b58\u51e6\u7406\u304c\u5b9f\u88c5\u3055\u308c\u306a\u304b\u3063\u305f"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 416.6,
+        "tokens": 52059,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "search_series.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306b\u7cfb\u5217\u691c\u7d22\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": false,
+          "evidence": "search_series.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001\u72ec\u81ea\u306e search_fm08_usd.py \u3092\u4f5c\u6210\u3057\u305f"
+        },
+        {
+          "text": "DB='FM08'\u304b\u3064keyword='USD'\u76f8\u5f53\u306e\u5f15\u6570\u3067\u30b3\u30de\u30f3\u30c9\u304c\u5b9f\u884c\u3055\u308c\u305f",
+          "passed": true,
+          "evidence": "\u72ec\u81ea\u30b9\u30af\u30ea\u30d7\u30c8\u3067 db=FM08, keyword=USD \u76f8\u5f53\u306e\u51e6\u7406\u3092\u5b9f\u884c\u3057\u3001\u3055\u3089\u306bWebSearch\u3067\u88dc\u5b8c\u3057\u305f"
+        },
+        {
+          "text": "\u7cfb\u5217\u30b3\u30fc\u30c9\u307e\u305f\u306f\u305d\u308c\u306b\u6e96\u305a\u308b\u60c5\u5831\u304c\u51fa\u529b\u306b\u542b\u307e\u308c\u308b\uff08\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u304b\u4e00\u89a7\u306e\u3044\u305a\u308c\u304b\uff09",
+          "passed": true,
+          "evidence": "WebSearch\u3067FXERD01-07, FXERM06, FXERM07\u7b49\u306e\u7cfb\u5217\u30b3\u30fc\u30c9\u4e00\u89a7\u3092\u53d6\u5f97\u30fb\u51fa\u529b\u3057\u305f\uff0834 tool uses\u4f7f\u7528\uff09"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9167,
+        "stddev": 0.1443,
+        "min": 0.75,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 74.1667,
+        "stddev": 30.3217,
+        "min": 47.8,
+        "max": 107.3
+      },
+      "tokens": {
+        "mean": 28511.0,
+        "stddev": 2557.1648,
+        "min": 25559,
+        "max": 30045
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.5833,
+        "stddev": 0.2207,
+        "min": 0.333,
+        "max": 0.75
+      },
+      "time_seconds": {
+        "mean": 323.4333,
+        "stddev": 97.0599,
+        "min": 222.9,
+        "max": 416.6
+      },
+      "tokens": {
+        "mean": 46934.0,
+        "stddev": 12764.0227,
+        "min": 32404,
+        "max": 56339
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.33",
+      "time_seconds": "-249.3",
+      "tokens": "-18423"
+    }
+  },
+  "notes": []
+}

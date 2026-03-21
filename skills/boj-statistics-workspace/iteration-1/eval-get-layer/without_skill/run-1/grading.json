@@ -1,0 +1,29 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-get-layer",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "get_layer.pyが実行された（出力にgetDataLayer使用の証拠がある）",
+      "passed": false,
+      "evidence": "get_layer.py は使用されず、/tmp/boj_get_layer.py を独自作成した"
+    },
+    {
+      "text": "--db FM08 --layer1 USD --frequency M 相当の引数が含まれる",
+      "passed": true,
+      "evidence": "独自スクリプトで db=FM08, layer1=USD, frequency=M を正しく指定した"
+    },
+    {
+      "text": "--output オプションでCSVファイルが指定・保存された（またはエラーメッセージが表示された）",
+      "passed": false,
+      "evidence": "CSV出力の引数指定がなく、ネットワークエラーのみ出力された。CSV保存処理が実装されなかった"
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.333,
+    "passed": 1,
+    "failed": 2,
+    "total": 3
+  },
+  "notes": "スクリプトをゼロから作成（42 tool uses, 331秒）。layer1パラメータは正しく使ったがCSV保存を実装しなかった"
+}
