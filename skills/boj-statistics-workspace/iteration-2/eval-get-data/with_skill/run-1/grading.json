@@ -1,0 +1,37 @@
+{
+  "eval_id": 2,
+  "configuration": "with_skill",
+  "run_number": 1,
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 4,
+    "failed": 0,
+    "total": 4
+  },
+  "timing": {
+    "total_duration_seconds": 21.5
+  },
+  "expectations": [
+    {
+      "text": "get_data.pyが実行された（出力にデータ取得の証拠がある）",
+      "passed": true,
+      "evidence": "python skills/boj-statistics/scripts/get_data.py が実行された"
+    },
+    {
+      "text": "--db FM08 かつ正しい為替系列コード（FXERM07等）が引数に含まれる（FXUSDMは誤コードなので不可）",
+      "passed": true,
+      "evidence": "FXERM07を正しく使用。iteration-1ではFXUSDM（誤コード）を使っていたが、SKILL.md修正により今回はFXERM07を使用"
+    },
+    {
+      "text": "--start 202401 または --end 202412 相当の期間指定が含まれる",
+      "passed": true,
+      "evidence": "--start 202401 --end 202412 が正しく指定された"
+    },
+    {
+      "text": "日付とデータ値のテーブルまたは適切なエラーメッセージが出力に含まれる",
+      "passed": true,
+      "evidence": "ネットワーク制限による通信エラーメッセージが適切に出力された"
+    }
+  ],
+  "notes": ["iteration-1でFXUSDM（誤コード）→iteration-2でFXERM07（正コード）に修正。SKILL.md修正の効果が確認された"]
+}

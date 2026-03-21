@@ -1,0 +1,111 @@
+======================================================================
+日銀API FM08データベース USD関連系列調査
+実行日時: 2026-03-21 06:51:56
+======================================================================
+
+------------------------------------------------------------
+1. getMetadata API - FM08データベースのメタデータ取得
+   目的: FM08データベース内の全系列一覧を取得する
+------------------------------------------------------------
+
+リクエストURL: https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=en&db=FM08
+URLエラー: Tunnel connection failed: 403 Forbidden
+→ メタデータ取得失敗
+
+------------------------------------------------------------
+2. getMetadata API - キーワード 'USD' で検索
+------------------------------------------------------------
+
+リクエストURL: https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=en&db=FM08&keyword=USD
+URLエラー: Tunnel connection failed: 403 Forbidden
+→ USD キーワード検索失敗
+
+------------------------------------------------------------
+3. getMetadata API - キーワード 'dollar' で検索
+------------------------------------------------------------
+
+リクエストURL: https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=en&db=FM08&keyword=dollar
+URLエラー: Tunnel connection failed: 403 Forbidden
+→ dollar キーワード検索失敗
+
+------------------------------------------------------------
+4. getMetadata API - キーワード '米ドル' で検索
+------------------------------------------------------------
+
+リクエストURL: https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=jp&db=FM08&keyword=%E7%B1%B3%E3%83%89%E3%83%AB
+URLエラー: Tunnel connection failed: 403 Forbidden
+→ 米ドル キーワード検索失敗
+
+------------------------------------------------------------
+5. getDataCode API - 既知のUSD系列コードでデータ取得テスト
+   既知コード: FXERM07 (USD/JPY月次平均), FXERM06 (USD/JPY月末)
+------------------------------------------------------------
+
+リクエストURL: https://www.stat-search.boj.or.jp/api/v1/getDataCode?format=json&lang=en&db=FM08&code=FXERM07%2CFXERM06&startDate=202401&endDate=202503
+URLエラー: Tunnel connection failed: 403 Forbidden
+→ データ取得失敗
+
+======================================================================
+調査まとめ
+======================================================================
+
+【ネットワーク環境】
+  この実行環境ではstat-search.boj.or.jpへのアクセスがプロキシによりブロックされています。
+  エラー: Tunnel connection failed: 403 Forbidden (host_not_allowed)
+
+【APIエンドポイント情報】
+  ベースURL: https://www.stat-search.boj.or.jp/api/v1/
+  提供されている3種類のAPI:
+    1. getMetadata  - 系列のメタデータ・一覧取得
+    2. getDataCode  - 系列コード指定でデータ取得
+    3. getDataLayer - レイヤー（分類階層）指定でデータ取得
+
+【FM08データベース概要】
+  DB名: FM08
+  内容: 外国為替市況 (Foreign Exchange Rates)
+  分類: Financial Markets カテゴリ
+
+【判明しているUSD関連系列コード】
+  文献・リポジトリ・Web検索から判明した系列コード:
+
+  系列コード     | 説明
+  -------------- | ----------------------------------------
+  FXERM07        | 東京市場インターバンク相場(月次)
+                 | 米ドル/円 17:00時点スポットレート 月中平均
+                 | Tokyo Market Interbank Rates (Monthly)
+                 | US Dollar/Yen Spot Rate at 17:00 JST,
+                 | Average in the Month, Yen per U.S. Dollar
+  FXERM06        | 東京市場インターバンク相場(月次)
+                 | 米ドル/円 17:00時点スポットレート 月末
+                 | Tokyo Market Interbank Rates (Monthly)
+                 | US Dollar/Yen Spot Rate at 17:00 JST,
+                 | End of Month, Yen per U.S. Dollar
+  FXUSDM         | 米ドル/円 月次平均為替レート
+                 | USD/JPY Monthly Average Exchange Rate
+
+【完全な系列一覧を取得するための推奨コマンド】
+  ネットワークアクセス可能な環境で以下を実行:
+
+  # 全メタデータ取得(英語)
+  curl 'https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=en&db=FM08'
+
+  # USD キーワード検索
+  curl 'https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=en&db=FM08&keyword=USD'
+
+  # 米ドル キーワード検索(日本語)
+  curl 'https://www.stat-search.boj.or.jp/api/v1/getMetadata?format=json&lang=jp&db=FM08&keyword=米ドル'
+
+  # 系列コード指定でデータ取得
+  curl 'https://www.stat-search.boj.or.jp/api/v1/getDataCode?format=json&lang=en&db=FM08&code=FXERM07&startDate=202401&endDate=202503'
+
+【参考情報】
+  - BOJ Time-Series Data Search API Manual (EN):
+    https://www.stat-search.boj.or.jp/info/api_manual_en.pdf
+  - FM08 Monthly Table:
+    https://www.stat-search.boj.or.jp/ssi/mtshtml/fm08_m_1_en.html
+  - BOJ Daily FX List:
+    https://www.boj.or.jp/en/statistics/market/forex/fxdaily/fxlist/index.htm
+  - Python クライアント (boj-api-client):
+    https://github.com/delihiros/boj-api-client
+  - BOJ API 使用例 (miwamasa/BOJ_API):
+    https://github.com/miwamasa/BOJ_API

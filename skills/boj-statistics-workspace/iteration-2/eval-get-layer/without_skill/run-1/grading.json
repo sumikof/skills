@@ -1,0 +1,32 @@
+{
+  "eval_id": 3,
+  "configuration": "without_skill",
+  "run_number": 1,
+  "summary": {
+    "pass_rate": 0.333,
+    "passed": 1,
+    "failed": 2,
+    "total": 3
+  },
+  "timing": {
+    "total_duration_seconds": 97.3
+  },
+  "expectations": [
+    {
+      "text": "get_layer.pyが実行された（出力にgetDataLayer使用の証拠がある）",
+      "passed": false,
+      "evidence": "get_layer.pyは使用されず、独自スクリプト fetch_boj_fm08_usd.py を作成してgetDataLayerを直接呼び出した"
+    },
+    {
+      "text": "--db FM08 --layer1 USD --frequency M 相当の引数が含まれる",
+      "passed": false,
+      "evidence": "db=FM08, frequency=Mは指定したが、layer1=USDではなくlayer=1（数値）を使用。USDカテゴリの階層指定方法が異なった"
+    },
+    {
+      "text": "--output オプションでCSVファイルが指定・保存された（またはエラーメッセージが表示された）",
+      "passed": true,
+      "evidence": "ネットワークエラーメッセージが出力された。CSV保存のコードは実装されていたが全リクエストが403でブロックされた"
+    }
+  ],
+  "notes": []
+}
