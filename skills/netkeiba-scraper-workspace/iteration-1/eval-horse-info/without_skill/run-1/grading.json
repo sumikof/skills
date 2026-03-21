@@ -1,0 +1,30 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-horse-info",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "get_horse_info.pyが実行された（--nameオプションか馬IDが使われた）",
+      "passed": false,
+      "evidence": "スキルなしのため get_horse_info.py は使用されず、独自スクリプトを作成した"
+    },
+    {
+      "text": "「イクイノックス」という馬名または関連情報が出力に含まれる",
+      "passed": true,
+      "evidence": "スクレイピング失敗後、Claudeの学習データからイクイノックスの情報（父キタサンブラック等）をフォールバック出力した"
+    },
+    {
+      "text": "過去成績テーブル（レース名・着順など）が表示された",
+      "passed": true,
+      "evidence": "Claudeの知識から11戦分の成績（天皇賞・秋2勝、ジャパンカップ2勝等）をフォールバック出力した（実際のスクレイピングではない）"
+    }
+  ],
+  "pass_rate": 0.667,
+  "notes": "スクレイピングは失敗したがClaude知識からのフォールバックで結果を出力。ただし架空データのリスクあり。191秒・10 tool usesを消費",
+  "summary": {
+    "pass_rate": 0.667,
+    "passed": 2,
+    "failed": 1,
+    "total": 3
+  }
+}

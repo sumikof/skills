@@ -1,0 +1,263 @@
+{
+  "metadata": {
+    "skill_name": "netkeiba-scraper",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-03-21T03:00:35Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 32.7,
+        "tokens": 18537,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_horse_info.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08--name\u30aa\u30d7\u30b7\u30e7\u30f3\u304b\u99acID\u304c\u4f7f\u308f\u308c\u305f\uff09",
+          "passed": true,
+          "evidence": "\u300c\u99ac\u540d\u300c\u30a4\u30af\u30a4\u30ce\u30c3\u30af\u30b9\u300d\u3067\u691c\u7d22\u4e2d...\u300d\u304c\u51fa\u529b\u3055\u308c\u3066\u304a\u308a\u3001--name\u30aa\u30d7\u30b7\u30e7\u30f3\u3067\u6b63\u3057\u304f\u5b9f\u884c\u3055\u308c\u305f"
+        },
+        {
+          "text": "\u300c\u30a4\u30af\u30a4\u30ce\u30c3\u30af\u30b9\u300d\u3068\u3044\u3046\u99ac\u540d\u307e\u305f\u306f\u95a2\u9023\u60c5\u5831\u304c\u51fa\u529b\u306b\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "\u300c\u99ac\u540d\u300c\u30a4\u30af\u30a4\u30ce\u30c3\u30af\u30b9\u300d\u3067\u691c\u7d22\u4e2d...\u300d\u306b\u3066\u99ac\u540d\u304c\u542b\u307e\u308c\u3066\u3044\u308b\uff08\u63a5\u7d9a\u30a8\u30e9\u30fc\u524d\u306b\u8868\u793a\uff09"
+        },
+        {
+          "text": "\u904e\u53bb\u6210\u7e3e\u30c6\u30fc\u30d6\u30eb\uff08\u30ec\u30fc\u30b9\u540d\u30fb\u7740\u9806\u306a\u3069\uff09\u304c\u8868\u793a\u3055\u308c\u305f",
+          "passed": false,
+          "evidence": "db.netkeiba.com\u3078\u306e\u63a5\u7d9a\u304c403\u30a8\u30e9\u30fc\u3067\u5931\u6557\u3057\u3001\u904e\u53bb\u6210\u7e3e\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3067\u304d\u306a\u304b\u3063\u305f"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 32.6,
+        "tokens": 17447,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_race_entry.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u8d70\u8868\u53d6\u5f97\u306e\u8a66\u884c\u304c\u3042\u308b\uff09",
+          "passed": true,
+          "evidence": "\u300c\u51fa\u8d70\u8868\u3092\u53d6\u5f97\u4e2d... (race_id: 202506010111)\u300d\u304c\u51fa\u529b\u3055\u308c\u3066\u3044\u308b"
+        },
+        {
+          "text": "get_odds.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u30aa\u30c3\u30ba\u53d6\u5f97\u306e\u8a66\u884c\u304c\u3042\u308b\uff09",
+          "passed": true,
+          "evidence": "\u300c\u30aa\u30c3\u30ba\u3092\u53d6\u5f97\u4e2d... (race_id: 202506010111)\u300d\u304c\u51fa\u529b\u3055\u308c\u3066\u3044\u308b"
+        },
+        {
+          "text": "\u51fa\u8d70\u8868\u307e\u305f\u306f\u30aa\u30c3\u30ba\u60c5\u5831\uff08\u3042\u308b\u3044\u306f\u9069\u5207\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\uff09\u304c\u51fa\u529b\u3055\u308c\u305f",
+          "passed": true,
+          "evidence": "\u4e21\u30b9\u30af\u30ea\u30d7\u30c8\u3068\u3082\u300c\u901a\u4fe1\u30a8\u30e9\u30fc: ...\u300d\u3068\u3057\u3066\u660e\u78ba\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u3092\u51fa\u529b\u3057\u305f"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 51.4,
+        "tokens": 16897,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_race_list.py\u30b9\u30af\u30ea\u30d7\u30c8\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306b\u30b9\u30af\u30ea\u30d7\u30c8\u5b9f\u884c\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": true,
+          "evidence": "\u51fa\u529b\u306b\u300cnetkeiba\u304b\u3089\u30ec\u30fc\u30b9\u60c5\u5831\u3092\u53d6\u5f97\u4e2d... (20260321)\u300d\u304c\u542b\u307e\u308c\u3066\u304a\u308a\u3001\u30b9\u30af\u30ea\u30d7\u30c8\u304c\u6b63\u3057\u304f\u8d77\u52d5\u3057\u305f"
+        },
+        {
+          "text": "\u30a8\u30e9\u30fc\u3067\u7570\u5e38\u7d42\u4e86\u3057\u3066\u3044\u306a\u3044\uff08\u901a\u4fe1\u30a8\u30e9\u30fc\u4ee5\u5916\u3067\u30af\u30e9\u30c3\u30b7\u30e5\u3057\u3066\u3044\u306a\u3044\uff09",
+          "passed": true,
+          "evidence": "exit code 0\u3001\u300c\u901a\u4fe1\u30a8\u30e9\u30fc: ...\u300d\u3068\u3057\u3066\u9069\u5207\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\u3067\u6b63\u5e38\u7d42\u4e86\u3057\u305f"
+        },
+        {
+          "text": "\u30ec\u30fc\u30b9\u4e00\u89a7\u30c6\u30fc\u30d6\u30eb\uff08\u7af6\u99ac\u5834\u540d\u30fb\u30ec\u30fc\u30b9ID\u7b49\uff09\u307e\u305f\u306f\u958b\u50ac\u306a\u3057\u65e8\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u51fa\u529b\u3055\u308c\u3066\u3044\u308b",
+          "passed": false,
+          "evidence": "\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u5236\u9650\u306b\u3088\u308anetkeiba.com\u306b\u63a5\u7d9a\u3067\u304d\u305a\u3001\u30ec\u30fc\u30b9\u4e00\u89a7\u306f\u8868\u793a\u3055\u308c\u306a\u304b\u3063\u305f\uff08\u901a\u4fe1\u30a8\u30e9\u30fc\u306e\u307f\uff09"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 191.6,
+        "tokens": 41848,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_horse_info.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08--name\u30aa\u30d7\u30b7\u30e7\u30f3\u304b\u99acID\u304c\u4f7f\u308f\u308c\u305f\uff09",
+          "passed": false,
+          "evidence": "\u30b9\u30ad\u30eb\u306a\u3057\u306e\u305f\u3081 get_horse_info.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001\u72ec\u81ea\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4f5c\u6210\u3057\u305f"
+        },
+        {
+          "text": "\u300c\u30a4\u30af\u30a4\u30ce\u30c3\u30af\u30b9\u300d\u3068\u3044\u3046\u99ac\u540d\u307e\u305f\u306f\u95a2\u9023\u60c5\u5831\u304c\u51fa\u529b\u306b\u542b\u307e\u308c\u308b",
+          "passed": true,
+          "evidence": "\u30b9\u30af\u30ec\u30a4\u30d4\u30f3\u30b0\u5931\u6557\u5f8c\u3001Claude\u306e\u5b66\u7fd2\u30c7\u30fc\u30bf\u304b\u3089\u30a4\u30af\u30a4\u30ce\u30c3\u30af\u30b9\u306e\u60c5\u5831\uff08\u7236\u30ad\u30bf\u30b5\u30f3\u30d6\u30e9\u30c3\u30af\u7b49\uff09\u3092\u30d5\u30a9\u30fc\u30eb\u30d0\u30c3\u30af\u51fa\u529b\u3057\u305f"
+        },
+        {
+          "text": "\u904e\u53bb\u6210\u7e3e\u30c6\u30fc\u30d6\u30eb\uff08\u30ec\u30fc\u30b9\u540d\u30fb\u7740\u9806\u306a\u3069\uff09\u304c\u8868\u793a\u3055\u308c\u305f",
+          "passed": true,
+          "evidence": "Claude\u306e\u77e5\u8b58\u304b\u308911\u6226\u5206\u306e\u6210\u7e3e\uff08\u5929\u7687\u8cde\u30fb\u79cb2\u52dd\u3001\u30b8\u30e3\u30d1\u30f3\u30ab\u30c3\u30d72\u52dd\u7b49\uff09\u3092\u30d5\u30a9\u30fc\u30eb\u30d0\u30c3\u30af\u51fa\u529b\u3057\u305f\uff08\u5b9f\u969b\u306e\u30b9\u30af\u30ec\u30a4\u30d4\u30f3\u30b0\u3067\u306f\u306a\u3044\uff09"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.333,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 255.0,
+        "tokens": 38515,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_race_entry.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u8d70\u8868\u53d6\u5f97\u306e\u8a66\u884c\u304c\u3042\u308b\uff09",
+          "passed": false,
+          "evidence": "\u30b9\u30ad\u30eb\u306a\u3057\u306e\u305f\u3081 get_race_entry.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001\u72ec\u81ea\u306escraper.py\u3092\u4f5c\u6210\u3057\u3066\u5b9f\u884c\u3057\u305f"
+        },
+        {
+          "text": "get_odds.py\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u30aa\u30c3\u30ba\u53d6\u5f97\u306e\u8a66\u884c\u304c\u3042\u308b\uff09",
+          "passed": false,
+          "evidence": "\u30b9\u30ad\u30eb\u306a\u3057\u306e\u305f\u3081 get_odds.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001\u72ec\u81ea\u30b3\u30fc\u30c9\u3067\u30aa\u30c3\u30ba\u53d6\u5f97\u3092\u8a66\u307f\u305f"
+        },
+        {
+          "text": "\u51fa\u8d70\u8868\u307e\u305f\u306f\u30aa\u30c3\u30ba\u60c5\u5831\uff08\u3042\u308b\u3044\u306f\u9069\u5207\u306a\u30a8\u30e9\u30fc\u30e1\u30c3\u30bb\u30fc\u30b8\uff09\u304c\u51fa\u529b\u3055\u308c\u305f",
+          "passed": true,
+          "evidence": "\u72ec\u81ea\u30b9\u30af\u30ea\u30d7\u30c8\u304c\u540c\u69d8\u306e403\u30a8\u30e9\u30fc\u3092\u51fa\u529b\u3057\u3001\u7d50\u679c\u3092\u51fa\u529b\u30d5\u30a1\u30a4\u30eb\u306b\u4fdd\u5b58\u3057\u305f"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 364.4,
+        "tokens": 55781,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "get_race_list.py\u30b9\u30af\u30ea\u30d7\u30c8\u304c\u5b9f\u884c\u3055\u308c\u305f\uff08\u51fa\u529b\u306b\u30b9\u30af\u30ea\u30d7\u30c8\u5b9f\u884c\u306e\u8a3c\u62e0\u304c\u3042\u308b\uff09",
+          "passed": false,
+          "evidence": "\u30b9\u30ad\u30eb\u306a\u3057\u306e\u305f\u3081 get_race_list.py \u306f\u4f7f\u7528\u3055\u308c\u305a\u3001WebSearch/WebFetch\u3092\u4f7f\u3063\u3066\u60c5\u5831\u3092\u53ce\u96c6\u3057\u305f"
+        },
+        {
+          "text": "\u30a8\u30e9\u30fc\u3067\u7570\u5e38\u7d42\u4e86\u3057\u3066\u3044\u306a\u3044\uff08\u901a\u4fe1\u30a8\u30e9\u30fc\u4ee5\u5916\u3067\u30af\u30e9\u30c3\u30b7\u30e5\u3057\u3066\u3044\u306a\u3044\uff09",
+          "passed": true,
+          "evidence": "WebSearch\u3092\u6d3b\u7528\u3057\u3066\u6b63\u5e38\u306b\u60c5\u5831\u53ce\u96c6\u3092\u5b8c\u4e86\u3057\u305f"
+        },
+        {
+          "text": "\u30ec\u30fc\u30b9\u4e00\u89a7\u30c6\u30fc\u30d6\u30eb\uff08\u7af6\u99ac\u5834\u540d\u30fb\u30ec\u30fc\u30b9ID\u7b49\uff09\u307e\u305f\u306f\u958b\u50ac\u306a\u3057\u65e8\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u51fa\u529b\u3055\u308c\u3066\u3044\u308b",
+          "passed": true,
+          "evidence": "WebSearch\u30673\u5834\uff08\u4e2d\u5c71\u30fb\u962a\u795e\u30fb\u4e2d\u4eac\uff09\u306e\u958b\u50ac\u60c5\u5831\u3068\u91cd\u8cde\u30ec\u30fc\u30b93\u672c\u306e\u8a73\u7d30\u3092\u53d6\u5f97\u30fb\u8868\u793a\u3057\u305f\u3002\u305f\u3060\u3057\u5168\u30ec\u30fc\u30b9\u8a73\u7d30\u306f\u672a\u53d6\u5f97\uff08\u91cd\u8cde\u306e\u307f\u8a73\u7d30\u3042\u308a\uff09\u3002\u30ec\u30fc\u30b9ID\u306f\u542b\u307e\u308c\u3066\u3044\u306a\u3044\u3002"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.778,
+        "stddev": 0.1923,
+        "min": 0.667,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 38.9,
+        "stddev": 10.8254,
+        "min": 32.6,
+        "max": 51.4
+      },
+      "tokens": {
+        "mean": 17627.0,
+        "stddev": 834.6856,
+        "min": 16897,
+        "max": 18537
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.5557,
+        "stddev": 0.1928,
+        "min": 0.333,
+        "max": 0.667
+      },
+      "time_seconds": {
+        "mean": 270.3333,
+        "stddev": 87.4145,
+        "min": 191.6,
+        "max": 364.4
+      },
+      "tokens": {
+        "mean": 45381.3333,
+        "stddev": 9159.2588,
+        "min": 38515,
+        "max": 55781
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.22",
+      "time_seconds": "-231.4",
+      "tokens": "-27754"
+    }
+  },
+  "notes": []
+}

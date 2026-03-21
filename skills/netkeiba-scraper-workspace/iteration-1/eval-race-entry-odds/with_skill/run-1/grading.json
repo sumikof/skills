@@ -1,0 +1,30 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-race-entry-odds",
+  "run_type": "with_skill",
+  "expectations": [
+    {
+      "text": "get_race_entry.pyが実行された（出走表取得の試行がある）",
+      "passed": true,
+      "evidence": "「出走表を取得中... (race_id: 202506010111)」が出力されている"
+    },
+    {
+      "text": "get_odds.pyが実行された（オッズ取得の試行がある）",
+      "passed": true,
+      "evidence": "「オッズを取得中... (race_id: 202506010111)」が出力されている"
+    },
+    {
+      "text": "出走表またはオッズ情報（あるいは適切なエラーメッセージ）が出力された",
+      "passed": true,
+      "evidence": "両スクリプトとも「通信エラー: ...」として明確なエラーメッセージを出力した"
+    }
+  ],
+  "pass_rate": 1.0,
+  "notes": "スキルのガイダンスに従い2つのスクリプトを即座に特定・実行。9 tool usesと効率的。ネットワーク制限により実データは取得不可",
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

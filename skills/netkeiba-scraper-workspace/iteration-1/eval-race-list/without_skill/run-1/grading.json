@@ -1,0 +1,30 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-race-list",
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "get_race_list.pyスクリプトが実行された（出力にスクリプト実行の証拠がある）",
+      "passed": false,
+      "evidence": "スキルなしのため get_race_list.py は使用されず、WebSearch/WebFetchを使って情報を収集した"
+    },
+    {
+      "text": "エラーで異常終了していない（通信エラー以外でクラッシュしていない）",
+      "passed": true,
+      "evidence": "WebSearchを活用して正常に情報収集を完了した"
+    },
+    {
+      "text": "レース一覧テーブル（競馬場名・レースID等）または開催なし旨のメッセージが出力されている",
+      "passed": true,
+      "evidence": "WebSearchで3場（中山・阪神・中京）の開催情報と重賞レース3本の詳細を取得・表示した。ただし全レース詳細は未取得（重賞のみ詳細あり）。レースIDは含まれていない。"
+    }
+  ],
+  "pass_rate": 0.667,
+  "notes": "WebSearchで部分的な情報は取得できたが、全レース一覧やレースIDは取得できなかった。364秒・33 tool usesと大幅に時間とリソースを消費",
+  "summary": {
+    "pass_rate": 0.667,
+    "passed": 2,
+    "failed": 1,
+    "total": 3
+  }
+}
