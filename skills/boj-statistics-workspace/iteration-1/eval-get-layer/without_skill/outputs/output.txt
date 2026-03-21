@@ -1,8 +1,0 @@
-[実行開始] 2026-03-21 06:22:36
-データ取得条件: DB='FM08', layer1=USD, 頻度=M
-使用API: https://www.stat-search.boj.or.jp/api/v1/getDataLayer
-[API呼び出し] GET https://www.stat-search.boj.or.jp/api/v1/getDataLayer
-  params: {'format': 'json', 'lang': 'jp', 'db': 'FM08', 'layer1': 'USD', 'frequency': 'M'}
-[通信エラー] HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getDataLayer?format=json&lang=jp&db=FM08&layer1=USD&frequency=M (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
-
-[エラー] データ取得失敗: HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getDataLayer?format=json&lang=jp&db=FM08&layer1=USD&frequency=M (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))

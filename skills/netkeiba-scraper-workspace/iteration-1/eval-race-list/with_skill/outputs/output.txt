@@ -1,8 +1,0 @@
-=== get_race_list.py 実行ログ ===
-実行日時: Sat Mar 21 02:52:31 UTC 2026
-対象日付: 20260321 (今日)
-
-netkeibaからレース情報を取得中... (20260321)
-通信エラー: HTTPSConnectionPool(host='race.netkeiba.com', port=443): Max retries exceeded with url: /top/race_list_sub.html?kaisai_date=20260321 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
-
-終了コード: 0

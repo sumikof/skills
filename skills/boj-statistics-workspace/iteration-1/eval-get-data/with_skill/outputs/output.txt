@@ -1,3 +1,0 @@
-DB 'FM08' / 系列: FXUSDM (202401〜202412) のデータを取得中...
-通信エラー: HTTPSConnectionPool(host='www.stat-search.boj.or.jp', port=443): Max retries exceeded with url: /api/v1/getDataCode?format=json&lang=jp&db=FM08&code=FXUSDM&startDate=202401&endDate=202412 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
-EXIT_CODE: 1
