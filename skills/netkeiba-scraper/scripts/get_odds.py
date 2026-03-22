@@ -9,7 +9,6 @@ netkeibaからオッズを取得する。
 """
 
 import sys
-import json
 import argparse
 import time
 import requests
@@ -24,10 +23,10 @@ HEADERS = {
     )
 }
 
-# 馬券種別とAPIパラメータのマッピング
+# 馬券種別とパラメータのマッピング
 ODDS_TYPES = {
     "tansho":    {"label": "単勝",  "type_param": "b1"},
-    "fukusho":   {"label": "複勝",  "type_param": "b3"},
+    "fukusho":   {"label": "複勝",  "type_param": "b1"},
     "umaren":    {"label": "馬連",  "type_param": "b4"},
     "wide":      {"label": "ワイド", "type_param": "b5"},
     "umatan":    {"label": "馬単",  "type_param": "b6"},
@@ -36,92 +35,160 @@ ODDS_TYPES = {
 }
 
 
-def fetch_tansho_fukusho(race_id: str) -> dict:
-    """単勝・複勝オッズをAPIから取得"""
-    url = f"https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={race_id}&type=b1&action=update"
-    resp = requests.get(url, headers=HEADERS, timeout=15)
-    resp.raise_for_status()
-    resp.encoding = "UTF-8"
-
-    data = {"tansho": [], "fukusho": []}
-
-    try:
-        json_data = resp.json()
-        odds_data = json_data.get("data", {}).get("odds", {})
-
-        # 単勝オッズ (b1)
-        for num, val in odds_data.get("1", {}).items():
-            if isinstance(val, list) and len(val) >= 1:
-                data["tansho"].append({"num": num, "odds": val[0]})
-            elif isinstance(val, str):
-                data["tansho"].append({"num": num, "odds": val})
-
-        # 複勝オッズ (b3)
-        for num, val in odds_data.get("3", {}).items():
-            if isinstance(val, list) and len(val) >= 2:
-                data["fukusho"].append({"num": num, "odds_low": val[0], "odds_high": val[1]})
-            elif isinstance(val, str):
-                data["fukusho"].append({"num": num, "odds_low": val, "odds_high": val})
-
-    except (json.JSONDecodeError, KeyError, TypeError):
-        # HTMLページからフォールバック
-        data = fetch_odds_html(race_id, "b1")
-
-    return data
-
-
-def fetch_odds_html(race_id: str, type_param: str) -> dict:
-    """HTMLページからオッズをスクレイピング"""
+def _fetch_soup(race_id: str, type_param: str) -> BeautifulSoup:
+    """オッズページのHTMLを取得してBeautifulSoupを返す"""
     url = f"https://race.netkeiba.com/odds/index.html?race_id={race_id}&type={type_param}"
     resp = requests.get(url, headers=HEADERS, timeout=15)
     resp.raise_for_status()
     resp.encoding = "EUC-JP"
+    return BeautifulSoup(resp.text, "lxml")
 
-    soup = BeautifulSoup(resp.text, "lxml")
-    result = {"html_data": []}
 
-    table = soup.select_one("#odds_tan_fuku_block, .OddsTable, table[id*='odds']")
-    if table:
-        for row in table.select("tr"):
-            cells = row.find_all(["td", "th"])
-            if cells:
-                row_data = [c.get_text(strip=True) for c in cells]
-                result["html_data"].append(row_data)
+def fetch_tansho_fukusho(race_id: str) -> dict:
+    """単勝・複勝オッズをHTMLページから取得"""
+    soup = _fetch_soup(race_id, "b1")
+    data = {"tansho": [], "fukusho": []}
 
-    return result
+    # 単勝テーブル (#odds_tan_block内)
+    tan_block = soup.select_one("#odds_tan_block table.RaceOdds_HorseList_Table")
+    if tan_block:
+        for row in tan_block.select("tr")[1:]:  # ヘッダー行をスキップ
+            cells = row.find_all("td")
+            if len(cells) >= 6:
+                umaban = cells[1].get_text(strip=True)
+                odds = cells[5].get_text(strip=True)
+                if umaban:
+                    data["tansho"].append({"num": umaban, "odds": odds})
+
+    # 複勝テーブル (#odds_fuku_block内)
+    fuku_block = soup.select_one("#odds_fuku_block table.RaceOdds_HorseList_Table")
+    if fuku_block:
+        for row in fuku_block.select("tr")[1:]:
+            cells = row.find_all("td")
+            if len(cells) >= 6:
+                umaban = cells[1].get_text(strip=True)
+                odds_text = cells[5].get_text(strip=True)
+                if umaban:
+                    # 複勝オッズは "1.2 - 3.4" の形式の場合がある
+                    if "-" in odds_text and odds_text != "---.-":
+                        parts = odds_text.split("-")
+                        data["fukusho"].append({
+                            "num": umaban,
+                            "odds_low": parts[0].strip(),
+                            "odds_high": parts[1].strip(),
+                        })
+                    else:
+                        data["fukusho"].append({
+                            "num": umaban,
+                            "odds_low": odds_text,
+                            "odds_high": odds_text,
+                        })
+
+    return data
 
 
 def fetch_combined_odds(race_id: str, type_param: str) -> list[list]:
-    """馬連・馬単・3連複・3連単などの組み合わせオッズを取得"""
-    url = f"https://race.netkeiba.com/api/api_get_jra_odds.html?race_id={race_id}&type={type_param}&action=update"
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=15)
-        resp.raise_for_status()
-        json_data = resp.json()
-        odds_raw = json_data.get("data", {}).get("odds", {})
+    """馬連・馬単・ワイドなどの組み合わせオッズをHTMLから取得
 
-        rows = []
-        # type_param から数字を抽出
-        type_num = type_param.replace("b", "")
-        type_odds = odds_raw.get(type_num, {})
+    三角行列テーブルをパースして [馬番1, 馬番2, オッズ] のリストを返す。
+    """
+    soup = _fetch_soup(race_id, type_param)
+    rows = []
 
-        for key, val in type_odds.items():
-            odds_val = val[0] if isinstance(val, list) else str(val)
-            nums = key.split("_")
-            rows.append(nums + [odds_val])
+    for table in soup.select("table.Odds_Table"):
+        tr_list = table.find_all("tr")
+        if not tr_list:
+            continue
 
-        # オッズ順にソート（数値変換できないものは末尾へ）
-        def odds_key(r):
-            try:
-                return float(r[-1])
-            except (ValueError, IndexError):
-                return 9999
+        # 最初の行は軸馬番号
+        first_cells = tr_list[0].find_all(["td", "th"])
+        if not first_cells:
+            continue
+        axis_num = first_cells[0].get_text(strip=True)
 
-        rows.sort(key=odds_key)
-        return rows
+        # 残りの行は相手馬番号とオッズ
+        for tr in tr_list[1:]:
+            cells = tr.find_all("td")
+            if len(cells) >= 2:
+                partner_num = cells[0].get_text(strip=True)
+                odds_val = cells[1].get_text(strip=True)
+                if axis_num and partner_num:
+                    rows.append([axis_num, partner_num, odds_val])
 
-    except (requests.RequestException, json.JSONDecodeError, KeyError):
-        return []
+    # オッズ順にソート（数値変換できないものは末尾へ）
+    def odds_key(r):
+        try:
+            return float(r[-1])
+        except (ValueError, IndexError):
+            return 9999
+
+    rows.sort(key=odds_key)
+    return rows
+
+
+def fetch_sanren_odds(race_id: str, type_param: str, head_count: int = 18) -> list[list]:
+    """3連複・3連単オッズをHTMLから取得
+
+    軸馬ごとにページを取得し、三角行列を展開して
+    [馬番1, 馬番2, 馬番3, オッズ] のリストを返す。
+    """
+    all_rows = []
+    seen = set()
+
+    for jiku in range(1, head_count + 1):
+        url = (
+            f"https://race.netkeiba.com/odds/index.html"
+            f"?race_id={race_id}&type={type_param}&jiku={jiku}"
+        )
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+            resp.raise_for_status()
+            resp.encoding = "EUC-JP"
+        except requests.RequestException:
+            continue
+
+        soup = BeautifulSoup(resp.text, "lxml")
+        tables = soup.select("table.Odds_Table")
+        if not tables:
+            break  # この軸馬は出走していない → これ以上の軸馬もなし
+
+        for table in tables:
+            tr_list = table.find_all("tr")
+            if not tr_list:
+                continue
+
+            first_cells = tr_list[0].find_all(["td", "th"])
+            if not first_cells:
+                continue
+            second_num = first_cells[0].get_text(strip=True)
+
+            for tr in tr_list[1:]:
+                cells = tr.find_all("td")
+                if len(cells) >= 2:
+                    third_num = cells[0].get_text(strip=True)
+                    odds_val = cells[1].get_text(strip=True)
+
+                    if type_param == "b7":
+                        # 3連複: 順番不問なのでソートして重複排除
+                        combo = tuple(sorted([str(jiku), second_num, third_num]))
+                    else:
+                        # 3連単: 順番が意味を持つ
+                        combo = (str(jiku), second_num, third_num)
+
+                    if combo not in seen:
+                        seen.add(combo)
+                        all_rows.append(list(combo) + [odds_val])
+
+        time.sleep(0.3)
+
+    def odds_key(r):
+        try:
+            return float(r[-1])
+        except (ValueError, IndexError):
+            return 9999
+
+    all_rows.sort(key=odds_key)
+    return all_rows
 
 
 def print_tansho_fukusho(race_id: str):
@@ -142,9 +209,6 @@ def print_tansho_fukusho(race_id: str):
             t_str = f"{t.get('num', ''):<4} {t.get('odds', '-'):<12}" if t else " " * 16
             f_str = f"{f.get('num', ''):<4} {f.get('odds_low', '-')}〜{f.get('odds_high', '-')}" if f else ""
             print(f"{t_str}  {f_str}")
-    elif "html_data" in data:
-        for row in data["html_data"][:20]:
-            print("  ".join(row))
     else:
         print("オッズ情報が取得できませんでした。")
 
@@ -153,7 +217,11 @@ def print_tansho_fukusho(race_id: str):
 
 def print_combined(race_id: str, odds_type: str):
     config = ODDS_TYPES[odds_type]
-    rows = fetch_combined_odds(race_id, config["type_param"])
+
+    if odds_type in ("sanrenpuku", "sanrentan"):
+        rows = fetch_sanren_odds(race_id, config["type_param"])
+    else:
+        rows = fetch_combined_odds(race_id, config["type_param"])
 
     print(f"\n=== {config['label']}オッズ [{race_id}] ===\n")
 
@@ -164,7 +232,6 @@ def print_combined(race_id: str, odds_type: str):
 
     # 上位20件を表示
     display_rows = rows[:20]
-    type_label = config["label"]
 
     if odds_type in ("umaren", "wide", "umatan"):
         print(f"{'1頭目':<6} {'2頭目':<6} オッズ")

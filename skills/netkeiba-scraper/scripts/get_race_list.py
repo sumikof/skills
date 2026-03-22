@@ -34,7 +34,7 @@ def get_race_list(date_str: str) -> list[dict]:
     url = f"https://race.netkeiba.com/top/race_list_sub.html?kaisai_date={date_str}"
     resp = requests.get(url, headers=HEADERS, timeout=15)
     resp.raise_for_status()
-    resp.encoding = "EUC-JP"
+    resp.encoding = "UTF-8"
 
     soup = BeautifulSoup(resp.text, "lxml")
     races = []

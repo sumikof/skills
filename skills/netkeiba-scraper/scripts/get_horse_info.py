@@ -108,7 +108,7 @@ def get_horse_profile(horse_id: str) -> dict:
 
 def get_horse_races(horse_id: str, max_races: int = 10) -> list[dict]:
     """馬の過去レース成績を取得"""
-    url = f"https://db.netkeiba.com/horse/{horse_id}/"
+    url = f"https://db.netkeiba.com/horse/result/{horse_id}/"
     resp = requests.get(url, headers=HEADERS, timeout=15)
     resp.raise_for_status()
     resp.encoding = "EUC-JP"
