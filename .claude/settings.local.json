@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:disclosure2dl.edinet-fsa.go.jp)",
+      "Bash(sudo apt-get:*)",
+      "Bash(apt-get install:*)",
+      "Bash(pip install:*)",
+      "Bash(python3:*)"
+    ]
+  }
+}
