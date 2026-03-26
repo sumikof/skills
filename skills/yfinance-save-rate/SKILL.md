@@ -47,7 +47,7 @@ python3 scripts/save_price.py --domain ovr-etf --db /path/to/my.db --period 3mo
 
 | domain | 内容 |
 |--------|------|
-| `dom`（デフォルト） | スクリプト内 `ALL_TICKERS` リスト |
+| `dom`（デフォルト） | 国内株式上場銘柄一覧 |
 | `ovr-index` | 主要株価指数（DJI, NDX, GSPC, N225 など） |
 | `cmd-future` | 商品先物（原油, 金, 農産物 など） |
 | `ovr-etf` | 主要ETF（SPY, QQQ, GLD など） |

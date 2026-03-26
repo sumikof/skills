@@ -261,17 +261,11 @@ def _split_by_ticker(df: "pandas.DataFrame", tickers: List[str]) -> dict:
     return result
 
 
-def save_prices(conn: sqlite3.Connection, tickers: List[str], period: str) -> dict:
-    """複数ティッカーの株価を一括取得してDBに保存する。
+BATCH_SIZE = 500
 
-    Args:
-        tickers: ティッカーシンボルのリスト
-        period: 取得期間（例: 1mo, 3mo, 1y）
-    Returns:
-        {ticker: 保存件数} の辞書
-    """
-    import pandas as pd
 
+def _download_and_save(conn: sqlite3.Connection, tickers: List[str], period: str) -> dict:
+    """tickers を一括ダウンロードしてDBに保存する。BATCH_SIZE 以下のリストを受け取る想定。"""
     df = yf.download(tickers, period=period, auto_adjust=True, progress=False)
     if df.empty:
         return {}
@@ -297,6 +291,26 @@ def save_prices(conn: sqlite3.Connection, tickers: List[str], period: str) -> di
         VALUES (?, ?, ?, ?, ?, ?, ?)
     """, rows)
     conn.commit()
+    return counts
+
+
+def save_prices(conn: sqlite3.Connection, tickers: List[str], period: str) -> dict:
+    """複数ティッカーの株価を一括取得してDBに保存する。
+
+    BATCH_SIZE を超える場合は BATCH_SIZE 件ずつに分割してダウンロードする。
+
+    Args:
+        tickers: ティッカーシンボルのリスト
+        period: 取得期間（例: 1mo, 3mo, 1y）
+    Returns:
+        {ticker: 保存件数} の辞書
+    """
+    counts = {}
+    batches = [tickers[i:i + BATCH_SIZE] for i in range(0, len(tickers), BATCH_SIZE)]
+    for i, batch in enumerate(batches, 1):
+        if len(batches) > 1:
+            print(f"バッチ {i}/{len(batches)} ({len(batch)}銘柄) をダウンロード中...")
+        counts.update(_download_and_save(conn, batch, period))
     return counts
 
 
