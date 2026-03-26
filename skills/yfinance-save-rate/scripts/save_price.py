@@ -139,18 +139,25 @@ class ExchangeRate(enum.Enum):
 
 
 # xlsxから全銘柄リストを取得するURL
-DOM_XLSX_URL: str = ""  # TODO: xlsxのURLを設定する
+DOM_XLSX_URL: str = "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/fdi/list.xlsx"
 
 
 def load_tickers_from_xlsx(url: str) -> List[str]:
     """外部のxlsxファイルを取得し、ティッカー一覧を返す。
 
+    シート「上場企業の銘柄リスト」の1行目をヘッダー、2行目以降をデータとして読み込む。
+    「証券コード」列の値に `.T` を付加してyfinance形式のティッカーを生成する。
+
     Args:
         url: xlsxファイルのURL
     Returns:
-        ティッカーシンボルのリスト
+        ティッカーシンボルのリスト（例: ["1301.T", "1332.T", ...]）
     """
-    pass
+    import pandas as pd
+    df = pd.read_excel(url, sheet_name="上場企業の銘柄リスト", header=0)
+    code_col = [c for c in df.columns if "証券コード" in c][0]
+    codes = df[code_col].dropna().astype(str).str.strip()
+    return [f"{code}.T" for code in codes if code]
 
 
 # 全銘柄リスト（ticker指定なし時に使用）
@@ -219,34 +226,78 @@ def save_domain_fetch_time(conn: sqlite3.Connection, domain: str) -> None:
     conn.commit()
 
 
-def save_prices(conn: sqlite3.Connection, ticker: str, period: str) -> int:
-    df = yf.download(ticker, period=period, auto_adjust=True, progress=False)
+def _split_by_ticker(df: "pandas.DataFrame", tickers: List[str]) -> dict:
+    """yfinance のダウンロード結果を {ticker: DataFrame} に正規化する。
+
+    yfinance は単一ティッカーと複数ティッカーでカラム構造が異なる:
+    - 単一: フラット列 (Open, High, Low, Close, Volume)
+    - 複数: MultiIndex 列 (Price, Ticker) または (Ticker, Price)
+
+    いずれの形式でも各ティッカーのフラットな DataFrame に変換して返す。
+    """
+    import pandas as pd
+
+    if not isinstance(df.columns, pd.MultiIndex):
+        # 単一ティッカー: そのまま返す
+        return {tickers[0]: df}
+
+    # MultiIndex の場合、どちらのレベルにティッカーがあるか判定する
+    level0_vals = set(df.columns.get_level_values(0))
+    is_ticker_at_level0 = any(t in level0_vals for t in tickers)
+
+    result = {}
+    for ticker in tickers:
+        try:
+            if is_ticker_at_level0:
+                # (Ticker, Price) 形式
+                ticker_df = df[ticker].copy()
+            else:
+                # (Price, Ticker) 形式 → xs でティッカー軸を抽出
+                ticker_df = df.xs(ticker, axis=1, level=1).copy()
+            if not ticker_df.empty:
+                result[ticker] = ticker_df
+        except KeyError:
+            pass
+    return result
+
+
+def save_prices(conn: sqlite3.Connection, tickers: List[str], period: str) -> dict:
+    """複数ティッカーの株価を一括取得してDBに保存する。
+
+    Args:
+        tickers: ティッカーシンボルのリスト
+        period: 取得期間（例: 1mo, 3mo, 1y）
+    Returns:
+        {ticker: 保存件数} の辞書
+    """
+    import pandas as pd
+
+    df = yf.download(tickers, period=period, auto_adjust=True, progress=False)
     if df.empty:
-        print(f"[{ticker}] データが取得できませんでした")
-        return 0
+        return {}
 
-    # MultiIndex列の場合はティッカーレベルを削除して平坦化
-    if isinstance(df.columns, __import__("pandas").MultiIndex):
-        df.columns = df.columns.get_level_values(0)
-
+    ticker_dfs = _split_by_ticker(df, tickers)
+    counts = {}
     rows = []
-    for date, row in df.iterrows():
-        rows.append((
-            ticker,
-            str(date.date()),
-            float(row["Open"]),
-            float(row["High"]),
-            float(row["Low"]),
-            float(row["Close"]),
-            int(row["Volume"]),
-        ))
+    for ticker, tdf in ticker_dfs.items():
+        for date, row in tdf.iterrows():
+            rows.append((
+                ticker,
+                str(date.date()),
+                float(row["Open"]),
+                float(row["High"]),
+                float(row["Low"]),
+                float(row["Close"]),
+                int(row["Volume"]),
+            ))
+        counts[ticker] = len(tdf)
 
     conn.executemany("""
         INSERT OR REPLACE INTO stock_prices (ticker, date, open, high, low, close, volume)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     """, rows)
     conn.commit()
-    return len(rows)
+    return counts
 
 
 def main():
@@ -267,10 +318,9 @@ def main():
     conn = init_db(args.db)
     print(f"DB: {args.db} | 対象銘柄数: {len(tickers)}")
 
-    for ticker in tickers:
-        count = save_prices(conn, ticker, args.period)
+    counts = save_prices(conn, tickers, args.period)
+    for ticker, count in counts.items():
         if count > 0:
-            # 最新の株価を表示
             row = conn.execute(
                 "SELECT date, close FROM stock_prices WHERE ticker=? ORDER BY date DESC LIMIT 1",
                 (ticker,)

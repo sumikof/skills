@@ -10,7 +10,7 @@ yfinanceで株価・各種レートを取得し、SQLiteデータベースに保
 ## 必須環境
 
 ```bash
-pip install yfinance
+pip install yfinance pandas openpyxl
 ```
 
 ## ワークフロー
