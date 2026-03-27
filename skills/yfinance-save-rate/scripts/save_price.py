@@ -181,13 +181,13 @@ def get_all_tickers(domain: str = "dom") -> List[str]:
                 "dom"の場合はALL_TICKERSを返す。
                 それ以外は_DOMAIN_MAPのenumクラスのvalueリストを返す。
     """
-    if domain == "DOM":
+    if domain == "dom":
         if DOM_XLSX_URL:
             return load_tickers_from_xlsx(DOM_XLSX_URL)
         return ALL_TICKERS
     enum_cls = _DOMAIN_MAP.get(domain)
     if enum_cls is None:
-        raise ValueError(f"未対応のdomain: '{domain}'. 利用可能: DOM, {', '.join(_DOMAIN_MAP)}")
+        raise ValueError(f"未対応のdomain: '{domain}'. 利用可能: dom, {', '.join(_DOMAIN_MAP)}")
     return [e.value for e in enum_cls]
 
 
@@ -282,7 +282,7 @@ def _download_and_save(conn: sqlite3.Connection, tickers: List[str], period: str
                 float(row["High"]),
                 float(row["Low"]),
                 float(row["Close"]),
-                int(row["Volume"]),
+                int(row["Volume"]) if not (isinstance(row["Volume"], float) and row["Volume"] != row["Volume"]) else None,
             ))
         counts[ticker] = len(tdf)
 
@@ -319,7 +319,7 @@ def main():
     parser.add_argument("tickers", nargs="*", help="ティッカーシンボル（例: 7203.T）。省略時は全銘柄を取得")
     parser.add_argument("--db", default="finance-rate.db", help="SQLiteファイルパス（デフォルト: finance-rate.db）")
     parser.add_argument("--period", default="1mo", help="取得期間（例: 1mo, 3mo, 1y）デフォルト: 1mo")
-    parser.add_argument("--domain", default="DOM", help="全銘柄取得時のドメイン（デフォルト: DOM）")
+    parser.add_argument("--domain", default="dom", help="全銘柄取得時のドメイン（デフォルト: DOM）")
     args = parser.parse_args()
 
     # ticker未指定の場合は全銘柄を対象にする
