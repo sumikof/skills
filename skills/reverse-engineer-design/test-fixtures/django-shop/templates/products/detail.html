@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Django Shop{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+
+  <!-- パンくずリスト -->
+  <nav class="text-sm text-gray-500 mb-6">
+    <ol class="flex items-center gap-2">
+      <li><a href="{% url 'products:list' %}" class="hover:text-blue-600">商品一覧</a></li>
+      {% if product.category %}
+      <li><span class="mx-1">/</span></li>
+      <li>
+        <a href="{% url 'products:list' %}?category={{ product.category.slug }}"
+           class="hover:text-blue-600">
+          {{ product.category.name }}
+        </a>
+      </li>
+      {% endif %}
+      <li><span class="mx-1">/</span></li>
+      <li class="text-gray-900 font-medium">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+    <!-- 商品画像 -->
+    <div>
+      {% if product.image %}
+      <img src="{{ product.image.url }}"
+           alt="{{ product.name }}"
+           class="w-full rounded-xl object-cover aspect-square">
+      {% else %}
+      <div class="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center">
+        <span class="text-gray-400">画像なし</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- 商品情報 -->
+    <div>
+      {% if product.category %}
+      <span class="text-sm text-blue-600 font-medium">{{ product.category.name }}</span>
+      {% endif %}
+
+      <h1 class="text-3xl font-bold text-gray-900 mt-2 mb-4">{{ product.name }}</h1>
+
+      <p class="text-3xl font-bold text-gray-900 mb-6">
+        &yen;{{ product.price|floatformat:0 }}
+      </p>
+
+      <div class="mb-6">
+        {% if product.is_in_stock %}
+        <span class="inline-flex items-center gap-1.5 text-green-600 text-sm font-medium">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          在庫あり（残り {{ product.stock }} 点）
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1.5 text-red-500 text-sm font-medium">
+          在庫なし
+        </span>
+        {% endif %}
+      </div>
+
+      <p class="text-gray-600 leading-relaxed mb-8">{{ product.description }}</p>
+
+      {% if product.is_in_stock %}
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'orders:cart-add' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <div class="flex items-center gap-4 mb-4">
+          <label for="quantity" class="text-sm font-medium text-gray-700">数量</label>
+          <input type="number" id="quantity" name="quantity"
+                 value="1" min="1" max="{{ product.stock }}"
+                 class="w-20 border rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <button type="submit"
+                class="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors">
+          カートに追加
+        </button>
+      </form>
+      {% else %}
+      <a href="{% url 'accounts:login' %}?next={{ request.path }}"
+         class="block w-full py-3 text-center bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700">
+        ログインして購入
+      </a>
+      {% endif %}
+      {% endif %}
+
+      <!-- 商品メタ情報 -->
+      <div class="mt-8 pt-6 border-t text-sm text-gray-500">
+        <p>登録日: {{ product.created_at|date:"Y年m月d日" }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
