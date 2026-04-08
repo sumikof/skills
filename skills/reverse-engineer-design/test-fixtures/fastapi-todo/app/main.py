@@ -6,7 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.database import Base, engine
-from app.api import auth, todos, categories
+from app.api import auth
+from app.api import todos
+from app.api import categories
 
 
 @asynccontextmanager
