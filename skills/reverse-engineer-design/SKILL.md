@@ -40,8 +40,8 @@ description: "リポジトリのソースコードを解析してシステム設
 **解析開始前に毎回実行する：**
 
 ```bash
-# 1. re_db.py のパスを確認
-RE_DB=$(find ~/.claude -name re_db.py 2>/dev/null | head -1)
+# 1. re_db.py のパスを確認（複数の候補パスを検索）
+RE_DB=$(find ~/.claude /home /root -name "re_db.py" -path "*/reverse-engineer-design/*" 2>/dev/null | head -1)
 echo "re_db path: $RE_DB"
 
 # 2. 解析対象リポジトリのルートに移動（ユーザーが指定したパス）

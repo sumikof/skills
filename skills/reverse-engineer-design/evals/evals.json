@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "このリポジトリのソースコードを分析して、システム設計書を作成してください。",
-      "expected_output": "docs/design/ 配下にREADME.md, system-overview.md, api-endpoints.md, data-model.md, features/ が生成される。FastAPIのエンドポイントが網羅されていること。SQLAlchemyモデルからER図が生成されていること。",
+      "expected_output": "docs/design/ 配下にREADME.md, system-overview.md, api-endpoints.md, data-model.md, features/ が生成される。SQLiteのre_analysis.dbが作成され、解析結果が蓄積される。FastAPIのエンドポイントが網羅されていること。SQLAlchemyモデルからER図が生成されていること。",
       "files": [],
       "working_directory": "test-fixtures/fastapi-todo",
       "expectations": [
@@ -17,13 +17,16 @@
         "data-model.md にMermaid erDiagram が含まれている",
         "data-model.md にUser, Todo, Categoryモデルのテーブル定義がある",
         "features/ ディレクトリに1つ以上の機能詳細ファイルが存在する",
-        "ドキュメントが日本語で記述されている"
+        "ドキュメントが日本語で記述されている",
+        ".re_analysis.db ファイルが作成されている（re_db.py init が実行された証拠）",
+        "transcript に python と re_db.py を含むBashコマンドが実行されている",
+        "transcript に context summary または step done コマンドが含まれている"
       ]
     },
     {
       "id": 2,
       "prompt": "このリポジトリの設計書を起こしてください。",
-      "expected_output": "docs/design/ 配下にREADME.md, system-overview.md, api-endpoints.md, data-model.md, features/ が生成される。Next.jsのApp Routerの画面構成が把握されていること。PrismaスキーマからER図が生成されていること。",
+      "expected_output": "docs/design/ 配下にREADME.md, system-overview.md, api-endpoints.md, data-model.md, features/ が生成される。SQLiteのre_analysis.dbが作成される。Next.jsのApp Routerの画面構成が把握されていること。PrismaスキーマからER図が生成されていること。",
       "files": [],
       "working_directory": "test-fixtures/nextjs-blog",
       "expectations": [
@@ -36,13 +39,15 @@
         "data-model.md にUser, Post, Category, Comment, Tagモデルの定義がある",
         "features/ または system-overview.md に画面一覧（ブログ一覧、記事詳細、ダッシュボード等）が含まれている",
         "features/ ディレクトリに1つ以上の機能詳細ファイルが存在する",
-        "ドキュメントが日本語で記述されている"
+        "ドキュメントが日本語で記述されている",
+        ".re_analysis.db ファイルが作成されている（re_db.py init が実行された証拠）",
+        "transcript に python と re_db.py を含むBashコマンドが実行されている"
       ]
     },
     {
       "id": 3,
       "prompt": "このプロジェクトをリバースエンジニアリングして、システムの設計書を自動生成してください。",
-      "expected_output": "docs/design/ 配下にREADME.md, system-overview.md, api-endpoints.md, data-model.md, features/ が生成される。DjangoのURLパターンからエンドポイントが網羅されていること。Djangoモデルからテーブル定義とER図が生成されていること。テンプレートから画面一覧が把握されていること。",
+      "expected_output": "docs/design/ 配下にREADME.md, system-overview.md, api-endpoints.md, data-model.md, features/ が生成される。SQLiteのre_analysis.dbが作成される。DjangoのURLパターンからエンドポイントが網羅されていること。Djangoモデルからテーブル定義とER図が生成されていること。テンプレートから画面一覧が把握されていること。",
       "files": [],
       "working_directory": "test-fixtures/django-shop",
       "expectations": [
@@ -55,7 +60,9 @@
         "data-model.md にProduct, Order, Cart, CustomUserモデルの定義がある",
         "features/ または機能詳細ドキュメントに画面一覧（商品一覧、商品詳細、カート、注文履歴等）が含まれている",
         "features/ ディレクトリに1つ以上の機能詳細ファイルが存在する",
-        "ドキュメントが日本語で記述されている"
+        "ドキュメントが日本語で記述されている",
+        ".re_analysis.db ファイルが作成されている（re_db.py init が実行された証拠）",
+        "transcript に python と re_db.py を含むBashコマンドが実行されている"
       ]
     }
   ]
