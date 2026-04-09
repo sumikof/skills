@@ -394,21 +394,6 @@ python $RE_DB --db .re_analysis.db step done \
 
 ---
 
-## フレームワーク別の分析ポイント
-
-分析対象のフレームワークに応じて以下の点に注目する。詳細は `references/framework-guide.md` を参照。
-
-| フレームワーク | ルーティング定義 | モデル定義 | 画面定義 |
-|---------------|-----------------|-----------|---------|
-| Next.js / Nuxt.js | `app/` or `pages/` ディレクトリ構造 | Prisma / Drizzle | `app/` or `pages/` のコンポーネント |
-| Django / Rails | `urls.py` / `routes.rb` | `models.py` / `app/models/` | `templates/` / `views/` |
-| FastAPI / Express | ルーターファイル | SQLAlchemy / Mongoose モデル | N/A（API専用の場合） |
-| Spring Boot | `@RequestMapping` アノテーション | `@Entity` アノテーション | Thymeleaf テンプレート |
-| Laravel | `routes/` ディレクトリ | `app/Models/` | `resources/views/` |
-| Flutter / React Native | ナビゲーション定義 | ローカルDB / APIクライアント | Screen / Page コンポーネント |
-
----
-
 ## 分析対象にAPIやフロントエンドが存在しない場合
 
 - **CLIツール**: 画面一覧の代わりにコマンド一覧・サブコマンド体系を記述する
