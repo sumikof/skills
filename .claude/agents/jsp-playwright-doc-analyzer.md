@@ -78,7 +78,7 @@ taglibが不明・独自の場合は、property/path/id 属性から素直に na
 | 相対パス(`foo.jsp` `./x` `../x` `sub/x.do`) | 内部 |
 | 自アプリ配下の絶対パス(`/app/x.jsp` `/x.do` `/x.action`) | 内部 |
 | `http(s)://` で別ホスト | 外部 → 除外 |
-| `mailto:` `tel:` 遷移なし`javascript:void(0)` | 対象外 |
+| `mailto:` / `tel:` / `javascript:void(0)`(遷移なし) | 対象外 |
 | `javascript:` だが実質内部画面へ遷移 | 内部として遷移先を推定 |
 
 ### Step 6. オペレーションの網羅と遷移先の一意化

@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "evals/fixtures/input 配下のJSPを解析して、Playwright用ページオブジェクトを書くためのドキュメントを ./output に作ってください。入力と同じ構成でMarkdownを出力してください。",
-      "expected_output": "output/login.md と output/user/list.md が生成される。各ファイルは 画面概要/要素(ロケーター)/オペレーション/遷移先 の4セクション。login: userId,password,ログインボタンのロケーター(推奨1+候補)、ログインオペレーション(action=/app/login.do)、新規登録リンク(内部)を含む。外部manualリンクは除外。header/footerはincludeとしてパス記録のみ。hidden csrfは表に載せない。edit_${u.id}は動的ロケーターとして注記。",
+      "expected_output": "output/login.md, output/order.md, output/user/edit.md, output/user/list.md の4ファイルが生成される。各ファイルは 画面概要/要素(ロケーター)/オペレーション/遷移先 の4セクション。login: userId,password,ログインボタンのロケーター(推奨1+候補)、ログインオペレーション(action=/app/login.do)、新規登録リンク(内部)を含む。外部manualリンクは除外。header/footerはincludeとしてパス記録のみ。hidden csrfは表に載せない。list: edit_${u.id}は動的ロケーターとして注記(c:forEach行スコープ)。edit: Spring formタグリブをレンダリング後属性で推定。",
       "files": []
     },
     {
@@ -18,6 +18,12 @@
       "prompt": "order.jsp を1画面として、Playwright用ページオブジェクトのドキュメント(Markdown)を作ってください。MS932です。",
       "expected_output": "1フォームに confirm.do/saveDraft.do/list.do の3遷移先(formactionで分岐)。各遷移先がボタン(トリガー要素)ごとに別オペレーションへ分割され、要素表の関連オペレーション列と遷移先表のトリガー要素列で、どのボタンを押すとどこへ遷移するかが一意に読み取れる。共有入力要素(商品名/数量)は各操作に併記。",
       "files": ["evals/fixtures/input/order.jsp"]
+    },
+    {
+      "id": 4,
+      "prompt": "user/edit.jsp を1画面として、Playwright用ページオブジェクトのドキュメント(Markdown)を作ってください。MS932です。",
+      "expected_output": "Spring formタグリブをレンダリング後のHTML属性で推定してロケーター化: form:input path=name id=userName → #userName(推奨)+ name=name(候補)。form:select roleId → id未指定なので name=roleId ベース、optionは${roles}から動的生成と注記。radiobutton gender は nameでグループ化し value=M/F の個別指定方法を備考に記載。form:hidden id は要素表に載せない。いずれも「推定」の注記がある。",
+      "files": ["evals/fixtures/input/user/edit.jsp"]
     }
   ]
 }
