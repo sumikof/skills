@@ -1,0 +1,23 @@
+{
+  "skill_name": "jsp-playwright-doc",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "evals/fixtures/input 配下のJSPを解析して、Playwright用ページオブジェクトを書くためのドキュメントを ./output に作ってください。入力と同じ構成でMarkdownを出力してください。",
+      "expected_output": "output/login.md と output/user/list.md が生成される。各ファイルは 画面概要/要素(ロケーター)/オペレーション/遷移先 の4セクション。login: userId,password,ログインボタンのロケーター(推奨1+候補)、ログインオペレーション(action=/app/login.do)、新規登録リンク(内部)を含む。外部manualリンクは除外。header/footerはincludeとしてパス記録のみ。hidden csrfは表に載せない。edit_${u.id}は動的ロケーターとして注記。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "このディレクトリの login.jsp を1画面として、Playwrightのページオブジェクト作成用ドキュメント(Markdown)を1枚起こしてください。ファイルはMS932です。",
+      "expected_output": "1枚のMarkdown。login画面の操作可能要素のみ(画像・見出しは除外)、ログインのフォーム入力+submitオペレーション、新規登録への内部遷移、外部リンク除外。文字化けしていない。",
+      "files": ["evals/fixtures/input/login.jsp"]
+    },
+    {
+      "id": 3,
+      "prompt": "order.jsp を1画面として、Playwright用ページオブジェクトのドキュメント(Markdown)を作ってください。MS932です。",
+      "expected_output": "1フォームに confirm.do/saveDraft.do/list.do の3遷移先(formactionで分岐)。各遷移先がボタン(トリガー要素)ごとに別オペレーションへ分割され、要素表の関連オペレーション列と遷移先表のトリガー要素列で、どのボタンを押すとどこへ遷移するかが一意に読み取れる。共有入力要素(商品名/数量)は各操作に併記。",
+      "files": ["evals/fixtures/input/order.jsp"]
+    }
+  ]
+}
