@@ -17,6 +17,9 @@ html,body{margin:0;padding:0;height:100%;background:#1a1a1a;overflow:hidden}
 .slide{position:absolute;inset:0;width:1280px;height:720px;
   visibility:hidden;overflow:hidden;box-sizing:border-box}
 .slide.active{visibility:visible}
+/* JS無効環境へのフォールバック: 1枚目だけ表示し操作UIは隠す */
+body:not(.js) .slide:first-of-type{visibility:visible}
+body:not(.js) #hint,body:not(.js) #counter,body:not(.js) #progress{display:none}
 #progress{position:fixed;left:0;bottom:0;height:4px;width:0;background:#888;z-index:10}
 #counter{position:fixed;right:14px;bottom:10px;color:#999;
   font:12px/1 sans-serif;user-select:none;z-index:10}
@@ -45,6 +48,7 @@ html,body{margin:0;padding:0;height:100%;background:#1a1a1a;overflow:hidden}
 <script>
 (function(){
 "use strict";
+document.body.classList.add("js");
 var slides=[].slice.call(document.querySelectorAll(".slide")),n=slides.length,cur=-1;
 /* ページ番号を各スライドに付与 (.no-num は除外。表紙などに使う) */
 slides.forEach(function(s,i){
@@ -65,7 +69,8 @@ function show(i){
   slides.forEach(function(s,j){s.classList.toggle("active",j===cur);});
   document.getElementById("counter").textContent=(cur+1)+" / "+n;
   document.getElementById("progress").style.width=((cur+1)/n*100)+"%";
-  history.replaceState(null,"","#"+(cur+1));
+  /* サンドボックスiframe等ではreplaceStateが例外を投げるため握りつぶす */
+  try{history.replaceState(null,"","#"+(cur+1));}catch(e){}
 }
 addEventListener("resize",fit);
 addEventListener("keydown",function(e){
@@ -78,8 +83,10 @@ addEventListener("keydown",function(e){
     case "Home":show(0);break;
     case "End":show(n-1);break;
     case "f":case "F":
-      document.fullscreenElement?document.exitFullscreen()
-        :document.documentElement.requestFullscreen();
+      try{
+        document.fullscreenElement?document.exitFullscreen()
+          :document.documentElement.requestFullscreen().catch(function(){});
+      }catch(e){}
       break;
     default:return;
   }
