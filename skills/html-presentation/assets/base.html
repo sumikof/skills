@@ -3,40 +3,9 @@
 <head>
 <meta charset="utf-8">
 <title><!-- ===TITLE=== --></title>
-<style>
-/* =====================================================================
-   Presentation Engine — このstyleブロックとページ末尾のscriptブロックは
-   改変しないこと。見た目の変更はすべて下の style id="design"
-   (デザインファイルのインライン展開先) で行う。
-   スライドは 1280x720 (16:9) 固定で設計し、エンジンが画面にフィットさせる。
-   ===================================================================== */
-html,body{margin:0;padding:0;height:100%;background:#1a1a1a;overflow:hidden}
-#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;
-  transform:translate(-50%,-50%);background:#fff;
-  box-shadow:0 0 40px rgba(0,0,0,.5)}
-.slide{position:absolute;inset:0;width:1280px;height:720px;
-  visibility:hidden;overflow:hidden;box-sizing:border-box}
-.slide.active{visibility:visible}
-/* JS無効環境へのフォールバック: 1枚目だけ表示し操作UIは隠す */
-body:not(.js) .slide:first-of-type{visibility:visible}
-body:not(.js) #hint,body:not(.js) #counter,body:not(.js) #progress{display:none}
-#progress{position:fixed;left:0;bottom:0;height:4px;width:0;background:#888;z-index:10}
-#counter{position:fixed;left:14px;bottom:10px;color:#999;
-  font:12px/1 sans-serif;user-select:none;z-index:10}
-#hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
-  color:#eee;background:rgba(0,0,0,.65);padding:8px 18px;border-radius:6px;
-  font:13px/1.6 sans-serif;transition:opacity 1s;z-index:10;pointer-events:none}
-@media print{
-  html,body{background:#fff;overflow:visible;height:auto}
-  #stage{position:static;transform:none;box-shadow:none;width:1280px;height:auto}
-  .slide{position:relative;visibility:visible;page-break-after:always;break-after:page}
-  #progress,#counter,#hint{display:none}
-  @page{size:1280px 720px;margin:0}
-}
-</style>
-<style id="design">
-/* ===DESIGN_CSS=== */
-</style>
+<!-- エンジンCSS(土台)→デザインCSS(見た目) の順で読み込む。順序を入れ替えない。 -->
+<link rel="stylesheet" href="engine.css">
+<link rel="stylesheet" href="===DESIGN_CSS_HREF===">
 </head>
 <body>
 <div id="stage">
