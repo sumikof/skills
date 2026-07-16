@@ -5,16 +5,16 @@
       "id": 0,
       "eval_name": "proposal-dx-service",
       "prompt": "来月、地方の中堅製造業の顧客(株式会社タカセ工業)に、うちのDX支援サービス「Kaizen Cloud」の導入提案をすることになった。プレゼン資料を作りたいんだけど、まだ頭の中が整理できてない。質問しながら内容をまとめて、最終的にHTMLのスライドにしてほしい。10枚以内で。",
-      "expected_output": "段階式ヒアリング(全体像→構成案合意→ページ深堀り)の対話ログ、ページごとのtitle/content/patternを持つ presentation JSON、html-presentation 形式のHTMLスライド。シナリオにある事実が反映され、シナリオにない数値が創作されていないこと。",
+      "expected_output": "段階式ヒアリング(全体像→構成案合意→ページ深堀り)の対話ログ、ページごとのtitle/content/patternを持つ presentation YAML、html-presentation 形式のHTMLスライド。シナリオにある事実が反映され、シナリオにない数値が創作されていないこと。",
       "files": ["scenarios/proposal-dx.md"],
       "assertions": [
-        "presentation JSONが保存され、有効なJSONであり、全ページに no / title / content / pattern が揃っている",
+        "presentation YAMLが保存され、有効なYAMLであり、全ページに no / title / content / pattern が揃っている",
         "pattern の値がスキル定義の12種のみである",
         "シナリオの主要事実(月40時間削減、不良率1.2%→0.8%、月額15万円、トライアル2026年10月〜12月)が成果物に反映されている",
         "シナリオにない数値・効果が創作されていない",
         "ヒアリングログが段階式である(全体像→構成案提示→ページ深堀りの順で質問ラウンドが2回以上)",
         "構成案への修正要望(費用ページはトライアル費用のみ)が最終成果物に反映されている",
-        "HTMLスライドが生成され、スライド数が10枚以内かつJSONのページ数と一致する",
+        "HTMLスライドが生成され、スライド数が10枚以内かつYAMLのページ数と一致する",
         "表紙に「株式会社タカセ工業 御中」「○○システムズ株式会社 営業企画部」「2026年8月」が含まれる"
       ]
     },
@@ -22,34 +22,34 @@
       "id": 1,
       "eval_name": "poc-internal-report",
       "prompt": "社内のAIチャットボットPoCが終わったので、部長会向けの結果報告スライドを作りたい。データは手元にあるけど構成から相談したい。ヒアリングしてまとめて、最後はブラウザで見られるスライドにして。",
-      "expected_output": "調査・分析報告の定石構成に沿った presentation JSON とHTMLスライド。数値に出所が付き、課題3件と予算300万円の審議依頼が含まれること。",
+      "expected_output": "調査・分析報告の定石構成に沿った presentation YAML とHTMLスライド。数値に出所が付き、課題3件と予算300万円の審議依頼が含まれること。",
       "files": ["scenarios/poc-report.md"],
       "assertions": [
-        "presentation JSONが保存され、有効なJSONであり、全ページに no / title / content / pattern が揃っている",
+        "presentation YAMLが保存され、有効なYAMLであり、全ページに no / title / content / pattern が揃っている",
         "pattern の値がスキル定義の12種のみである",
         "PoCの主要数値(58%・n=1,340、4時間→3分、4.1/5.0・n=210)が反映され、出所「情報システム部 PoC実績集計(2026年6月)」が付いている",
         "課題3件(基幹系31%、ナレッジ運用未定、セキュリティ審査未了)がすべて含まれている",
         "次のアクションと追加予算300万円の審議依頼が含まれている",
         "シナリオにない数値・効果が創作されていない",
         "ヒアリングログが段階式である(全体像→構成案提示→ページ深堀りの順で質問ラウンドが2回以上)",
-        "HTMLスライドが生成され、スライド数が6〜10枚かつJSONのページ数と一致する"
+        "HTMLスライドが生成され、スライド数が6〜10枚かつYAMLのページ数と一致する"
       ]
     },
     {
       "id": 2,
       "eval_name": "study-session-casual",
       "prompt": "チームの勉強会で「PlaywrightによるE2Eテスト入門」の発表をすることになった。20分枠。スライドの中身を一緒に考えてほしい。最終的にHTMLスライドまで作って。",
-      "expected_output": "勉強会向けカジュアル構成の presentation JSON とHTMLスライド。ベンチマーク数値の創作がなく、「セットアップ10分」のメッセージが立っていること。",
+      "expected_output": "勉強会向けカジュアル構成の presentation YAML とHTMLスライド。ベンチマーク数値の創作がなく、「セットアップ10分」のメッセージが立っていること。",
       "files": ["scenarios/study-session.md"],
       "assertions": [
-        "presentation JSONが保存され、有効なJSONであり、全ページに no / title / content / pattern が揃っている",
+        "presentation YAMLが保存され、有効なYAMLであり、全ページに no / title / content / pattern が揃っている",
         "pattern の値がスキル定義の12種のみである",
         "表紙にタイトル「PlaywrightによるE2Eテスト入門」、発表者「山田」、日付「2026年7月17日」が含まれる",
         "キーメッセージ「セットアップ10分で始められる」が成果物に登場する",
         "Seleniumとの違い(auto-wait、トレース、ドライバ管理不要)とコード例がスライドに含まれる",
         "性能ベンチマーク等、シナリオにない数値が創作されていない",
         "ヒアリングログが段階式である(全体像→構成案提示→ページ深堀りの順で質問ラウンドが2回以上)",
-        "HTMLスライドが生成され、スライド数が8〜12枚かつJSONのページ数と一致する"
+        "HTMLスライドが生成され、スライド数が8〜12枚かつYAMLのページ数と一致する"
       ]
     }
   ]
